@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<book>
+    <entityId>NY_GCP</entityId>
+    <tradingLocation>NewYork</tradingLocation>
+    <tradingRegion>NA</tradingRegion>
+    <bookId>Book_2005</bookId>
+    <bookName>Opt_Book</bookName>
+    <bookType>FO</bookType>
+    <sourceSystem>ODS</sourceSystem>
+    <masterPortfolio>NY_PTF</masterPortfolio>
+    <costCenter>2001</costCenter>
+    <reportingUnit>100</reportingUnit>
+    <desk>NY_desk</desk>
+    <businessLine>FX</businessLine>
+    <globalBsuinessLine>FX</globalBsuinessLine>
+    <subDivision>IBM</subDivision>
+    <division>IB</division>
+    <bookStatus>Active</bookStatus>
+    <primaryTrader>Shup</primaryTrader>
+</book>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<book>
+    <entityId>SGPore_GCP</entityId>
+    <tradingLocation>Singapore</tradingLocation>
+    <tradingRegion>APAC</tradingRegion>
+    <bookId>Book_3005</bookId>
+    <bookName>Opt_Book</bookName>
+    <bookType>FO</bookType>
+    <sourceSystem>ODS</sourceSystem>
+    <masterPortfolio>APAC_PTF</masterPortfolio>
+    <costCenter>3001</costCenter>
+    <reportingUnit>100</reportingUnit>
+    <desk>SGP_desk</desk>
+    <businessLine>FX</businessLine>
+    <globalBsuinessLine>FX</globalBsuinessLine>
+    <subDivision>IBM</subDivision>
+    <division>IB</division>
+    <bookStatus>Active</bookStatus>
+    <primaryTrader>Shup</primaryTrader>
+</book>
