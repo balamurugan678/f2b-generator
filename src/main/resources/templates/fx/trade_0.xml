@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dealConfirmation>
+    <header>
+        <messageId messageIdScheme="Http://www.bankx.com/msg_id">${random.tradeMsgId()}</messageId>
+        <sentBy>GCPFX</sentBy>
+        <sendTo>MQuad</sendTo>
+        <creationTimestamp>${timestamp}</creationTimestamp>
+    </header>
+    <isCorrection>false</isCorrection>
+    <correlationId correlationIDScheme="http://www.maplequadpocservice.com/coding-scheme/GCPFX:DealId">${tradeId?c}</correlationId>
+    <sequenceNumber>${sequenceNumber}</sequenceNumber>
+    <onBehalfOf>
+        <partyReference href="party1"/>
+    </onBehalfOf>
+    <originatingEvent>Trade:New</originatingEvent>
+    <trade id="${tradeId?c}">
+        <tradeHeader>
+            <partyTradeIdentifier>
+                <issuer issuerIDScheme="http://www.fpml.org/coding-scheme/external/cftc/issuer-identifier">${tradeId?c}</issuer>
+                <globalTradeId tradeIdScheme="http://www.fpml.org/coding-scheme/external/unique-transaction-identifier">${tradeId?c}</globalTradeId>
+                <UTI>UTI_${tradeId?c}</UTI>
+            </partyTradeIdentifier>
+            <partyTradeInformation>
+                <partyReference href="party1"/>
+                <bookReference href="${book.bookId}"/>
+                <relatedParty>
+                    <partyReference href="party2"/>
+                    <role>Counterparty</role>
+                </relatedParty>
+                <relatedBusinessUnitReference>
+                    <businessUnitReference href="${book.desk}"/>
+                    <role>${book.businessLine}</role>
+                </relatedBusinessUnitReference>
+                <relatedPerson>
+                    <personReference href="person1"/>
+                    <role>Trader</role>
+                </relatedPerson>
+                <relatedPerson>
+                    <personReference href="person2"/>
+                    <role>Marketer</role>
+                </relatedPerson>
+                <!-- todo: optional tradergroup -->
+                <executionDateTime>${timestamp}</executionDateTime>
+                <largeSizeTrade>false</largeSizeTrade>
+                <executingType>Electronic</executingType>
+                <executionVenueType>SEF</executionVenueType>
+                <confirmationMethod>Facility</confirmationMethod>
+            </partyTradeInformation>
+            <tradeDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?c}-${timestamp.getDayOfMonth()}</tradeDate>
+        </tradeHeader>
+        <fxSingleLeg>
+            <primaryAssetClass>ForiegnExchange</primaryAssetClass>
+            <productType productTypeSchem="http://www.fpml.org/coding-scheme/product-taxonomy">ForeignExchange:Spot</productType>
+            <exchangeCurrency1>
+                <payerPartyReference href="party2"/>
+                <receiverParyReference href="party1"/>
+            </exchangeCurrency1>
+        </fxSingleLeg>
+    </trade>
+
+</dealConfirmation>

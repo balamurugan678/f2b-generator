@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<counterPartyEntity>
+    <messageHeader>
+        <publishedTime>2017-07-05T07:09:04.484Z</publishedTime>
+        <sourceSystem>Entity Central</sourceSystem>
+        <originatingSystem>Entity Central</originatingSystem>
+    </messageHeader>
+    <messageBody>
+        <main>
+            <partyId>PT0001</partyId>
+            <partyBIC>PTAPUS01</partyBIC>
+            <version>2</version>
+            <verificationStatus>Verified</verificationStatus>
+            <entityStatus>Active</entityStatus>
+            <effectiveFrom>2017-07-08</effectiveFrom>
+        </main>
+    </messageBody>
+</counterPartyEntity>
