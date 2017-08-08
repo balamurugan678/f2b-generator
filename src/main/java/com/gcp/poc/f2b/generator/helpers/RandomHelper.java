@@ -24,7 +24,8 @@ public class RandomHelper {
         return random.nextLong(min, max);
     }
 
-    public long number(long low, long high) {
-        return random.nextLong(low, high);
+    public long numberRangeMax2sf(long low, long high) {
+        long temp = (low/10);
+        return random.nextLong(low, high)/temp*temp;
     }
 }

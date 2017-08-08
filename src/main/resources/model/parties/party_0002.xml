@@ -14,5 +14,6 @@
             <entityStatus>Active</entityStatus>
             <effectiveFrom>2017-07-08</effectiveFrom>
         </main>
+        <legalName>Imad Bank</legalName>
     </messageBody>
 </counterPartyEntity>

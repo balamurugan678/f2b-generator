@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<exchangeRates>
+    <exchangeRate>
+        <currency1>GBP</currency1>
+        <currency2>USD</currency2>
+        <rate>1.2</rate>
+    </exchangeRate>
+    <exchangeRate>
+        <currency1>GBP</currency1>
+        <currency2>EUR</currency2>
+        <rate>1.1</rate>
+    </exchangeRate>
+    <exchangeRate>
+        <currency1>EUR</currency1>
+        <currency2>USD</currency2>
+        <rate>1.15</rate>
+    </exchangeRate>
+</exchangeRates>

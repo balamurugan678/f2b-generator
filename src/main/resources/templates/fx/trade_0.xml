@@ -46,7 +46,7 @@
                 <executionVenueType>SEF</executionVenueType>
                 <confirmationMethod>Facility</confirmationMethod>
             </partyTradeInformation>
-            <tradeDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?c}-${timestamp.getDayOfMonth()}</tradeDate>
+            <tradeDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()?string["00"]}</tradeDate>
         </tradeHeader>
         <fxSingleLeg>
             <primaryAssetClass>ForiegnExchange</primaryAssetClass>
@@ -54,8 +54,52 @@
             <exchangeCurrency1>
                 <payerPartyReference href="party2"/>
                 <receiverParyReference href="party1"/>
+                <receiverBookReference href="${book.bookId}"/>
+                <paymentAmount>
+                    <currency>${exchangeRate.currency1}</currency>
+                    <#assign amount1 = random.numberRangeMax2sf(10000000,95000000)>
+                    <#assign amount2 = amount1 * exchangeRate.rate>
+                    <amount>${amount1?c}</amount>
+                </paymentAmount>
             </exchangeCurrency1>
+            <exchangeCurrency2>
+                <payerPartyReference href="party1"/>
+                <receiverParyReference href="party2"/>
+                <receiverBookReference href="${book.bookId}"/>
+                <paymentAmount>
+                    <currency>${exchangeRate.currency2}</currency>
+                    <amount>${amount2?c}</amount>
+                </paymentAmount>
+            </exchangeCurrency2>
+            <valueDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()+2?string["00"]}</valueDate>
+            <exchangeRate>
+                <quoteCurrencyPair>
+                    <currency1>${exchangeRate.currency1}</currency1>
+                    <currency2>${exchangeRate.currency2}</currency2>
+                    <quoteBasis>Currency2PerCurrency1</quoteBasis>
+                </quoteCurrencyPair>
+                <rate>${exchangeRate.rate?string(",##0.0000")}</rate>
+            </exchangeRate>
         </fxSingleLeg>
     </trade>
-
+    <party id="party1">
+        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/LegalEntity">${book.entityId}</partyId>
+        <organizationType>LegalEntity</organizationType>
+        <businessUnit id="desk1">
+            <name>${book.desk}</name>
+        </businessUnit>
+        <person id="desk1">
+            <personId>${book.primaryTrader}</personId>
+        </person>
+        <person id="desk2">
+            <personId>Balr</personId>
+        </person>
+    </party>
+    <party id="party2">
+        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/PartyBIC">${party.body.main.partyId}</partyId>
+        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/LegalEntity">${party.body.legalName}</partyId>
+    </party>
+    <book id="${book.bookId}">
+        <book>${book.bookName}</book>
+    </book>
 </dealConfirmation>

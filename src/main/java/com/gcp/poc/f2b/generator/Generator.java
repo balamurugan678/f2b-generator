@@ -3,11 +3,13 @@ package com.gcp.poc.f2b.generator;
 import com.fasterxml.jackson.xml.XmlMapper;
 import com.gcp.poc.f2b.generator.helpers.RandomHelper;
 import com.gcp.poc.f2b.generator.model.Book;
+import com.gcp.poc.f2b.generator.model.ExchangeRate;
 import com.gcp.poc.f2b.generator.model.Party;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import org.codehaus.jackson.type.TypeReference;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -27,6 +29,7 @@ public class Generator {
 
     private final List<Book> books;
     private final List<Party> parties;
+    private final List<ExchangeRate> exchangeRates;
 
     private final List<Template> templates;
 
@@ -38,6 +41,7 @@ public class Generator {
         // Load models
         this.books = loadModel("books/"+templateFolder, Book.class);;
         this.parties = loadModel("parties", Party.class);
+        this.exchangeRates = loadExchangeRates();
 
         // Start free marker
         configuration = new Configuration(Configuration.VERSION_2_3_26);
@@ -67,6 +71,11 @@ public class Generator {
         Party party = parties.get(random.nextInt(parties.size()));
         root.put("party", party);
 
+        // Select random exchange rate
+        ExchangeRate exchangeRate = exchangeRates.get(random.nextInt(exchangeRates.size()));
+        root.put("exchangeRate", exchangeRate);
+
+        // Add random helper and tradeId to template
         RandomHelper randomHelper = new RandomHelper(random, book);
         root.put("random", randomHelper);
         root.put("tradeId", randomHelper.numberDigits(11));
@@ -79,6 +88,12 @@ public class Generator {
         template.process(root, out);
 
         return out.toString();
+    }
+
+    private List<ExchangeRate> loadExchangeRates() throws IOException {
+        XmlMapper xmlMapper = new XmlMapper();
+        String modelPath = Main.class.getClassLoader().getResource("model/other/exchangeRates.xml").getPath();
+        return xmlMapper.readValue(new File(modelPath), new TypeReference<List<ExchangeRate>>() {});//;.getExchangeRate();
     }
 
     private <T> List<T> loadModel(String folder, Class<T> type) throws IOException {

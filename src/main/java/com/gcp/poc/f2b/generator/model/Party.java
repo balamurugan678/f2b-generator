@@ -10,5 +10,13 @@ public class Party {
 
     @JacksonXmlProperty(localName = "messageBody")
     private PartyBody body;
+
+    public PartyHeader getHeader() {
+        return header;
+    }
+
+    public PartyBody getBody() {
+        return body;
+    }
 }
 
