@@ -45,14 +45,13 @@ public class Main {
         //todo: skip weekend days (and holidays?)
         LocalDate start = LocalDate.now().minusDays(5);
         LocalDate end = LocalDate.now();
-        int sequenceNumber = 1;
+
         for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
             LocalTime startTime = LocalTime.of(07, 30);
             LocalTime endTime = LocalTime.of(05, 30);
             int messagesGenerated = 0;
-            //for (LocalTime time = startTime; time.isBefore(endTime) || messagesGenerated < 5; time = time.plusNanos(3000 + random.nextInt(4000))) {
             for (LocalTime time = startTime; time.isBefore(endTime) || messagesGenerated < 5; time = time.plusMinutes(8 + random.nextInt(4)).plusNanos(random.nextInt(8, 1000000))) {
-                String xml = fxGenerator.next(date.atTime(time), sequenceNumber++);
+                String xml = fxGenerator.next(date.atTime(time));
 
                 System.out.println(xml);
 
@@ -64,14 +63,16 @@ public class Main {
             }
         }
 
+
         //Generate one invalid message
-        String xml = fxGenerator.next(LocalDateTime.now().minusMinutes(10), sequenceNumber++);
-        xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">.*?</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
+        String xml = fxGenerator.next(LocalDateTime.now().minusMinutes(10));
+        //xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">.*?</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
+        xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">PT0001</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
         System.out.println(xml);
         //pubsubHelper.send(xml);
 
         //Generate a pair of duplicate messages
-        xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5), sequenceNumber++);
+        /*xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5));
         System.out.println(xml);
         pubsubHelper.send(xml);
         Pattern p = Pattern.compile(">(.*?)</correlationId>");
@@ -80,8 +81,8 @@ public class Main {
         String tradeId = m.group(1);
         xml = xml.replaceAll(tradeId, "123456789103");
         System.out.println(xml);
-        pubsubHelper.send(xml);
-
+        //pubsubHelper.send(xml);
+*/
     }
 
     private static void sendMessage(String payload, SolaceHelper solaceHelper, int seqNum) throws JCSMPException {

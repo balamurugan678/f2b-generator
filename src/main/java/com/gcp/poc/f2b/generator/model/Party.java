@@ -5,6 +5,10 @@ import com.fasterxml.jackson.xml.annotate.JacksonXmlRootElement;
 
 @JacksonXmlRootElement(localName = "counterPartyEntity")
 public class Party {
+
+    // Note: this is set in code, not from XML
+    private String partyId;
+
     @JacksonXmlProperty(localName = "messageHeader")
     private PartyHeader header;
 
@@ -17,6 +21,14 @@ public class Party {
 
     public PartyBody getBody() {
         return body;
+    }
+
+    public String getPartyId() {
+        return partyId;
+    }
+
+    public void setPartyId(String partyId) {
+        this.partyId = partyId;
     }
 }
 

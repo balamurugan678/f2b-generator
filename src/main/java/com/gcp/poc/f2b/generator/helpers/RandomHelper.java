@@ -7,20 +7,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RandomHelper {
 
     private final ThreadLocalRandom random;
-    private final Book book;
 
-    public RandomHelper(ThreadLocalRandom random, Book book) {
+    public RandomHelper(ThreadLocalRandom random) {
         this.random = random;
-        this.book = book;
-    }
-
-    public String tradeMsgId() {
-        return "GCPFX" + book.getTradingRegion() + random.nextLong(10000000000000L, 99999999999999L);
     }
 
     // todo: there is a bug - it generates digits+1 number of digits
     public long numberDigits(int digits) {
-        long min = Math.round(Math.pow(10,digits));
+        if (digits < 2) {
+            throw new IllegalArgumentException("Digits must be > 1");
+        }
+        long min = Math.round(Math.pow(10,digits-1));
         long max = min * 10 - 1;
         return random.nextLong(min, max);
     }
@@ -28,5 +25,9 @@ public class RandomHelper {
     public long numberRangeMax2sf(long low, long high) {
         long temp = (low/10);
         return random.nextLong(low, high)/temp*temp;
+    }
+
+    public long number(long min, long max) {
+        return random.nextLong(min, max);
     }
 }

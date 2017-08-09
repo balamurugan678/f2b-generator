@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dealConfirmation>
     <header>
-        <messageId messageIdScheme="Http://www.bankx.com/msg_id">${random.tradeMsgId()}</messageId>
+        <messageId messageIdScheme="Http://www.bankx.com/msg_id">GCPFX${book.tradingRegion}${random.number(10000000000000, 99999999999999)?c}</messageId>
         <sentBy>GCPFX</sentBy>
         <sendTo>MQuad</sendTo>
         <creationTimestamp>${timestamp}</creationTimestamp>
     </header>
     <isCorrection>false</isCorrection>
-    <correlationId correlationIDScheme="http://www.maplequadpocservice.com/coding-scheme/GCPFX:DealId">${tradeId?c}</correlationId>
-    <sequenceNumber>${sequenceNumber}</sequenceNumber>
+    <correlationId correlationIDScheme="http://www.maplequadpocservice.com/coding-scheme/GCPFX:DealId">${dealId?c}</correlationId>
+    <sequenceNumber>1</sequenceNumber>
     <onBehalfOf>
         <partyReference href="party1"/>
     </onBehalfOf>
-    <originatingEvent>Trade:New</originatingEvent>
-    <trade id="${tradeId?c}">
+    <originatingEvent>Trade:Basket</originatingEvent>
+    <#list trades as trade>
+    <trade id="${trade.tradeId?c}">
         <tradeHeader>
             <partyTradeIdentifier>
-                <issuer issuerIDScheme="http://www.fpml.org/coding-scheme/external/cftc/issuer-identifier">${tradeId?c}</issuer>
-                <globalTradeId tradeIdScheme="http://www.fpml.org/coding-scheme/external/unique-transaction-identifier">${tradeId?c}</globalTradeId>
-                <UTI>UTI_${tradeId?c}</UTI>
+                <issuer issuerIDScheme="http://www.fpml.org/coding-scheme/external/cftc/issuer-identifier">${trade.tradeId?c}</issuer>
+                <globalTradeId tradeIdScheme="http://www.fpml.org/coding-scheme/external/unique-transaction-identifier">GTI${trade.tradeId?c}</globalTradeId>
+                <UTI>UTI_${trade.tradeId?c}</UTI>
             </partyTradeIdentifier>
             <partyTradeInformation>
                 <partyReference href="party1"/>
@@ -50,15 +51,15 @@
         </tradeHeader>
         <fxSingleLeg>
             <primaryAssetClass>ForiegnExchange</primaryAssetClass>
-            <productType productTypeSchem="http://www.fpml.org/coding-scheme/product-taxonomy">ForeignExchange:Spot</productType>
+            <productType productTypeSchem="http://www.fpml.org/coding-scheme/product-taxonomy">ForeignExchange:<#if book.bookName=='Spot_Book'>Spot<#else>Forward</#if></productType>
             <exchangeCurrency1>
                 <payerPartyReference href="party2"/>
                 <receiverParyReference href="party1"/>
                 <receiverBookReference href="${book.bookId}"/>
                 <paymentAmount>
-                    <currency>${exchangeRate.currency1}</currency>
+                    <currency>${trade.exchangeRate.currency1}</currency>
                     <#assign amount1 = random.numberRangeMax2sf(10000000,95000000)>
-                    <#assign amount2 = amount1 * exchangeRate.rate>
+                    <#assign amount2 = amount1 * trade.exchangeRate.rate>
                     <amount>${amount1?c}</amount>
                 </paymentAmount>
             </exchangeCurrency1>
@@ -67,21 +68,26 @@
                 <receiverParyReference href="party2"/>
                 <receiverBookReference href="${book.bookId}"/>
                 <paymentAmount>
-                    <currency>${exchangeRate.currency2}</currency>
+                    <currency>${trade.exchangeRate.currency2}</currency>
                     <amount>${amount2?c}</amount>
                 </paymentAmount>
             </exchangeCurrency2>
+            <#if book.bookName=='Spot_Book'>
             <valueDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()+2?string["00"]}</valueDate>
+            <#else>
+            <valueDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()+random.number(3,100)?string["00"]}</valueDate>
+            </#if>
             <exchangeRate>
                 <quoteCurrencyPair>
-                    <currency1>${exchangeRate.currency1}</currency1>
-                    <currency2>${exchangeRate.currency2}</currency2>
+                    <currency1>${trade.exchangeRate.currency1}</currency1>
+                    <currency2>${trade.exchangeRate.currency2}</currency2>
                     <quoteBasis>Currency2PerCurrency1</quoteBasis>
                 </quoteCurrencyPair>
-                <rate>${exchangeRate.rate?string(",##0.0000")}</rate>
+                <rate>${trade.exchangeRate.rate?string(",##0.0000")}</rate>
             </exchangeRate>
         </fxSingleLeg>
     </trade>
+    </#list>
     <party id="party1">
         <partyId partyIDScheme="http://www.fpml.org/coding-scheme/PartyBIC">${book.entityId}BIC</partyId>
         <partyId partyIDScheme="http://www.fpml.org/coding-scheme/LegalEntity">${book.entityId}</partyId>
@@ -89,17 +95,19 @@
         <businessUnit id="desk1">
             <name>${book.desk}</name>
         </businessUnit>
-        <person id="desk1">
+        <person id="person1">
             <personId>${book.primaryTrader}</personId>
         </person>
-        <person id="desk2">
+        <person id="person2">
             <personId>Balr</personId>
         </person>
     </party>
-    <party id="party2">
+    <#list parties as party>
+    <party id="${party.partyId}">
         <partyId partyIDScheme="http://www.fpml.org/coding-scheme/PartyBIC">${party.body.main.partyBIC}</partyId>
         <partyId partyIDScheme="http://www.fpml.org/coding-scheme/LegalEntity">${party.body.main.partyId}</partyId>
     </party>
+    </#list>
     <book id="${book.bookId}">
         <type>${book.bookName}</type>
     </book>

@@ -5,6 +5,7 @@ import com.gcp.poc.f2b.generator.helpers.RandomHelper;
 import com.gcp.poc.f2b.generator.model.Book;
 import com.gcp.poc.f2b.generator.model.ExchangeRate;
 import com.gcp.poc.f2b.generator.model.Party;
+import com.gcp.poc.f2b.generator.model.Trade;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -16,11 +17,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Generator {
@@ -41,6 +40,9 @@ public class Generator {
         // Load models
         this.books = loadModel("books/"+templateFolder, Book.class);;
         this.parties = loadModel("parties", Party.class);
+        IntStream.range(0,this.parties.size()).forEach(i ->
+            parties.get(i).setPartyId("party"+(i+2))
+        );
         this.exchangeRates = loadExchangeRates();
 
         // Start free marker
@@ -58,27 +60,43 @@ public class Generator {
         templates = this.loadTemplates(configuration, templateFolder);
     }
 
-    public String next(LocalDateTime dateTime, int sequenceNumber) throws IOException, TemplateException {
+    public String next(LocalDateTime dateTime) throws IOException, TemplateException {
         Map<String, Object> root = new HashMap<>();
         root.put("timestamp", dateTime);
-        root.put("sequenceNumber", sequenceNumber);
+
+        // Add random helper and dealId to template
+        RandomHelper randomHelper = new RandomHelper(random);
+        root.put("random", randomHelper);
+        root.put("dealId", randomHelper.numberDigits(12));
 
         // Select random book
         Book book = books.get(random.nextInt(books.size()));
         root.put("book", book);
 
-        // Select random counter party
-        Party party = parties.get(random.nextInt(parties.size()));
-        root.put("party", party);
+        // Select id and parties for trades
+        int numberOfTrades = random.nextInt(1,10);
+        Trade[] trades = new Trade[numberOfTrades];
+        Set<Party> partiesUsed = new HashSet<>();
+        for(int i=0; i<numberOfTrades; i++) {
 
-        // Select random exchange rate
-        ExchangeRate exchangeRate = exchangeRates.get(random.nextInt(exchangeRates.size()));
-        root.put("exchangeRate", exchangeRate);
+            // Select random counter party
+            Party party = parties.get(random.nextInt(parties.size()));
+            if (!partiesUsed.contains(party)) {
+                partiesUsed.add(party);
+            }
 
-        // Add random helper and tradeId to template
-        RandomHelper randomHelper = new RandomHelper(random, book);
-        root.put("random", randomHelper);
-        root.put("tradeId", randomHelper.numberDigits(11));
+            // Select random exchange rate
+            ExchangeRate exchangeRate = exchangeRates.get(random.nextInt(exchangeRates.size()));
+
+            // Create trade model
+            Trade trade = new Trade();
+            trade.setTradeId(randomHelper.numberDigits(12));
+            trade.setParty(party);
+            trade.setExchangeRate(exchangeRate);
+            trades[i] = trade;
+        }
+        root.put("trades", trades);
+        root.put("parties", partiesUsed);
 
         // Select template
         Template template = templates.get(random.nextInt(templates.size()));
