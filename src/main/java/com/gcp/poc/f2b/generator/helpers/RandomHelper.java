@@ -18,6 +18,7 @@ public class RandomHelper {
         return "GCPFX" + book.getTradingRegion() + random.nextLong(10000000000000L, 99999999999999L);
     }
 
+    // todo: there is a bug - it generates digits+1 number of digits
     public long numberDigits(int digits) {
         long min = Math.round(Math.pow(10,digits));
         long max = min * 10 - 1;

@@ -83,6 +83,7 @@
         </fxSingleLeg>
     </trade>
     <party id="party1">
+        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/PartyBIC">${book.entityId}BIC</partyId>
         <partyId partyIDScheme="http://www.fpml.org/coding-scheme/LegalEntity">${book.entityId}</partyId>
         <organizationType>LegalEntity</organizationType>
         <businessUnit id="desk1">
@@ -96,10 +97,10 @@
         </person>
     </party>
     <party id="party2">
-        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/PartyBIC">${party.body.main.partyId}</partyId>
-        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/LegalEntity">${party.body.legalName}</partyId>
+        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/PartyBIC">${party.body.main.partyBIC}</partyId>
+        <partyId partyIDScheme="http://www.fpml.org/coding-scheme/LegalEntity">${party.body.main.partyId}</partyId>
     </party>
     <book id="${book.bookId}">
-        <book>${book.bookName}</book>
+        <type>${book.bookName}</type>
     </book>
 </dealConfirmation>

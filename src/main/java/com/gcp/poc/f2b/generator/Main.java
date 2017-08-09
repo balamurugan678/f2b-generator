@@ -1,86 +1,116 @@
 package com.gcp.poc.f2b.generator;
 
-import com.gcp.poc.f2b.generator.helpers.BigQueryHelper;
-import com.gcp.poc.f2b.generator.model.Book;
-import com.gcp.poc.f2b.generator.model.Party;
-import com.solacesystems.jcsmp.JCSMPException;
-import freemarker.template.TemplateException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.xml.XmlMapper;
+import com.gcp.poc.f2b.generator.helpers.PubsubHelper;
+import com.gcp.poc.f2b.generator.helpers.RandomHelper;
+import com.gcp.poc.f2b.generator.helpers.SolaceHelper;
+import com.solacesystems.jcsmp.*;
+import com.solacesystems.jcsmp.impl.sdt.MapImpl;
+import freemarker.template.TemplateException;
+import org.codehaus.jackson.JsonNode;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Stream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 
-    public static void main( String[] args ) throws JCSMPException, IOException, TemplateException, ParseException {
+    private static final String SOLACE_HOST = "35.187.90.140:55555";
+    private static final String SOLACE_VPN_NAME = "genesis"; //or "default"
+    private static final String SOLACE_USERNAME = "apollo";
+    private static final String SOLACE_PASSWORD = "zerosugar";
+    private static final String SOLACE_TOPIC = "apollo/notify";
 
+    public static void main( String[] args ) throws JCSMPException, IOException, TemplateException, ParseException, ExecutionException, InterruptedException {
 
-
-        // Read trade templates
-        //List
-
-        // Create solae helper
-        //SolaceHelper solaceHelper = new SolaceHelper("","","","");
+        // Create solace helper
+        //SolaceHelper solaceHelper = new SolaceHelper(SOLACE_HOST, SOLACE_VPN_NAME, SOLACE_USERNAME, SOLACE_PASSWORD);
         //solaceHelper.init();
+        PubsubHelper pubsubHelper = new PubsubHelper();
 
-
-
-
+        // Create generator
         Generator fxGenerator = new Generator("fx");
-
-
-        //BigQueryHelper bigQueryHelper = new BigQueryHelper();
-        //bigQueryHelper.createDataset("vincenttest");
-        //bigQueryHelper.test(x);
-
 
         //for each day of last week, generate x trades
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
         //todo: skip weekend days (and holidays?)
         LocalDate start = LocalDate.now().minusDays(5);
         LocalDate end = LocalDate.now();
-
-        //Date startDate =  formatter.parse("2010-12-20");
-        //Date endDate = formatter.parse("2010-12-26");
-        //LocalDate start = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        //LocalDate end = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
         int sequenceNumber = 1;
         for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
             LocalTime startTime = LocalTime.of(07, 30);
             LocalTime endTime = LocalTime.of(05, 30);
             int messagesGenerated = 0;
-            for (LocalTime time = startTime; time.isBefore(endTime) || messagesGenerated < 5; time = time.plusNanos(3000 + random.nextInt(4000))) {
-                System.out.print(fxGenerator.next(date.atTime(time), sequenceNumber++));
+            //for (LocalTime time = startTime; time.isBefore(endTime) || messagesGenerated < 5; time = time.plusNanos(3000 + random.nextInt(4000))) {
+            for (LocalTime time = startTime; time.isBefore(endTime) || messagesGenerated < 5; time = time.plusMinutes(8 + random.nextInt(4)).plusNanos(random.nextInt(8, 1000000))) {
+                String xml = fxGenerator.next(date.atTime(time), sequenceNumber++);
+
+                System.out.println(xml);
+
+
+                //sendMessage(xml, solaceHelper, sequenceNumber);
+                //pubsubHelper.send(xml);
+
                 messagesGenerated++;
             }
         }
 
+        //Generate one invalid message
+        String xml = fxGenerator.next(LocalDateTime.now().minusMinutes(10), sequenceNumber++);
+        xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">.*?</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
+        System.out.println(xml);
+        //pubsubHelper.send(xml);
 
+        //Generate a pair of duplicate messages
+        xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5), sequenceNumber++);
+        System.out.println(xml);
+        pubsubHelper.send(xml);
+        Pattern p = Pattern.compile(">(.*?)</correlationId>");
+        Matcher m = p.matcher(xml);
+        m.find();
+        String tradeId = m.group(1);
+        xml = xml.replaceAll(tradeId, "123456789103");
+        System.out.println(xml);
+        pubsubHelper.send(xml);
 
- /*       for (int i=0; i< 1000; i++) {
-            XMLMessage message = solaceHelper.createMessage();
-            message.writeAttachment(randomMessageStream);
-            solaceHelper.sendMessage(message);
-        }*/
     }
 
+    private static void sendMessage(String payload, SolaceHelper solaceHelper, int seqNum) throws JCSMPException {
+        TextMessage message = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
+        message.setDeliveryMode(DeliveryMode.PERSISTENT);
+        message.setText(payload);
 
+        SDTMap messageProperties = new MapImpl();
+        String uuid = UUID.randomUUID().toString();
+        messageProperties.putString("runid", ""+seqNum);
+        messageProperties.putString("seqnum", String.valueOf(seqNum));
+        messageProperties.putString("uuid", UUID.randomUUID().toString());
+        messageProperties.putString("datatype", "message");
+        messageProperties.putLong("genesisstart", System.nanoTime());
+        //messageProperties.putString("datakey", tradeId);
+        messageProperties.putString("datakeyname", "tradeid");
+        messageProperties.putString("dataversion", "1.0");
+        Date now = new Date();
+        messageProperties.putString("timestamp", String.valueOf(now.getTime()));
+        message.setProperties(messageProperties);
+
+        solaceHelper.sendMessage(message);
+    }
+
+    private static String xmlToJson(String xml) throws IOException {
+        XmlMapper xmlMapper = new XmlMapper();
+        JsonNode node = xmlMapper.readTree(xml.getBytes());
+        ObjectMapper jsonMapper = new ObjectMapper();
+        String json = jsonMapper.writeValueAsString(node);
+        return json;
+    }
 }

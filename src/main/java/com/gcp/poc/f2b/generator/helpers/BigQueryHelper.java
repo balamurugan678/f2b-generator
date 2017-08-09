@@ -39,11 +39,17 @@ public class BigQueryHelper {
     }
 
     public void test(String x) throws IOException {
+
+
+
         TableId tableId = TableId.of("f2br", "vincenttest"+ThreadLocalRandom.current().nextInt());
         Field stringField = Field.of("StringField", Field.Type.string());
         Schema schema = Schema.of(stringField);
         StandardTableDefinition tableDefinition = StandardTableDefinition.of(schema);
         Table createdTable = bigquery.create(TableInfo.of(tableId, tableDefinition));
+
+        //createdTable.getDefinition().getSchema();
+
 
         //InsertAllRequest.RowToInsert.of()
         //createdTable.insert();
