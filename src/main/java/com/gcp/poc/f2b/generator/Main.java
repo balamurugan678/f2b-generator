@@ -72,17 +72,25 @@ public class Main {
         //pubsubHelper.send(xml);
 
         //Generate a pair of duplicate messages
-        /*xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5));
+        xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5));
         System.out.println(xml);
-        pubsubHelper.send(xml);
+        //pubsubHelper.send(xml);
+        //replace correlationId
         Pattern p = Pattern.compile(">(.*?)</correlationId>");
         Matcher m = p.matcher(xml);
         m.find();
         String tradeId = m.group(1);
-        xml = xml.replaceAll(tradeId, "123456789103");
+        RandomHelper randomHelper = new RandomHelper(random);
+        xml = xml.replace(tradeId, randomHelper.numberDigits(12)+"");
+        //replace tradeIds
+        Pattern p2 = Pattern.compile("<trade id=\"(\\d12)\">");
+        Matcher m2 = p2.matcher(xml);
+        while (m2.find()) {
+            xml.replaceAll(m.group(1), randomHelper.numberDigits(12)+"");
+        }
         System.out.println(xml);
         //pubsubHelper.send(xml);
-*/
+
     }
 
     private static void sendMessage(String payload, SolaceHelper solaceHelper, int seqNum) throws JCSMPException {
