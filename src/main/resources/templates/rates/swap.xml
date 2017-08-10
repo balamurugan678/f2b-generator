@@ -35,7 +35,7 @@
                 <receiverPartyReference href="party2"/>
                 <calculationPeriodDates id="floatingCalcPeriodDates">
                     <effectiveDate>
-                        <#assign swapDurationYears = random.number(1,10)*5>
+                        <#assign swapDurationYears = random.number(1,2)*5>
                         <#assign effectiveStartDate = dateHelper.addDays(timestamp, random.number(2,10))>
                         <#assign effectiveEndDate = dateHelper.addYears(effectiveStartDate, swapDurationYears)>
                         <#assign rollConvention = effectiveStartDate.getDayOfMonth()>
@@ -157,11 +157,103 @@
                 </cashflows>
             </swapStream>
             <swapStream>
-                
+                <payerPartyReference href="party2"/>
+                <receiverPartyReference href="party1"/>
+                <calculationPeriodDates id="floatingCalcPeriodDates">
+                    <effectiveDate>
+                        <unadjustedDate>${dateHelper.printDate(effectiveStartDate)}</unadjustedDate>
+                        <dateAdjustments>
+                            <businessDayConvention>NONE</businessDayConvention>
+                        </dateAdjustments>
+                    </effectiveDate>
+                    <terminationDate>
+                        <unadjustedDate>${dateHelper.printDate(effectiveEndDate)}</unadjustedDate>
+                        <dateAdjustments>
+                            <businessDayConvention>MODFOLLOWING</businessDayConvention>
+                            <businessCenters id="primaryBusinessCenters"/>
+                        </dateAdjustments>
+                    </terminationDate>
+                    <calculationPeriodDatesAdjustments>
+                        <businessDayConvention>MODFOLLOWING</businessDayConvention>
+                        <businessCentersReference href="primaryBusinessCenters"/>
+                    </calculationPeriodDatesAdjustments>
+                    <calculationPeriodFrequency>
+                        <periodMultiplier>
+                            <periodMultiplier>${calculationPeriodMultiplier}</periodMultiplier>
+                            <period>M</period>
+                            <rollConvention>${rollConvention}</rollConvention>
+                        </periodMultiplier>
+                    </calculationPeriodFrequency>
+                </calculationPeriodDates>
+                <paymentDates>
+                    <calculationPeriodDatesReference href="floatingCalcPeriodDates"/>
+                    <paymentFrequency>
+                        <periodMultiplier>${calculationPeriodMultiplier}</periodMultiplier>
+                        <period>M</period>
+                        <rollConvention>${rollConvention}</rollConvention>
+                    </paymentFrequency>
+                    <payRelativeTo>CalculationPeriodEndDate</payRelativeTo>
+                    <paymentDatesAdjsutments>
+                        <businessDayConvention>MODFOLLOWING</businessDayConvention>
+                        <businessCentersReference href="primaryBusinessCenters"/>
+                    </paymentDatesAdjsutments>
+                </paymentDates>
+                <calculationPeriodAmount>
+                    <calculation>
+                        <notionalSchedule>
+                            <notionalStepSchedule>
+                                <initalValue>${amount2?c}.00</initalValue>
+                                <currency>${exchangeRate.currency2}</currency>
+                            </notionalStepSchedule>
+                        </notionalSchedule>
+                        <fixedRateSchedule>
+                            <initialValue>0.06</initialValue>
+                        </fixedRateSchedule>
+                        <dayCountFraction>30E/360</dayCountFraction>
+                    </calculation>
+                </calculationPeriodAmount>
+                <principleExchanges>
+                    <initialExchange>true</initialExchange>
+                    <finalExchange>true</finalExchange>
+                    <intermediateExcahnge>false</intermediateExcahnge>
+                </principleExchanges>
+                <cashflows>
+                    <cashflowsMatchParameters>true</cashflowsMatchParameters>
+                    <principleExchange>
+                        <adjustedPrincipleExchangeDate>${dateHelper.printDate(effectiveStartDate)}</adjustedPrincipleExchangeDate>
+                        <principleExchangeAmount>-${amount2?c}.00</principleExchangeAmount>
+                    </principleExchange>
+                    <principleExchange>
+                        <adjustedPrincipleExchangeDate>${dateHelper.printDate(effectiveEndDate)}</adjustedPrincipleExchangeDate>
+                        <principleExchangeAmount>${amount2?c}.00</principleExchangeAmount>
+                    </principleExchange>
+                    <#list 1..(swapDurationYears*12/calculationPeriodMultiplier) as loopIndex>
+                    <paymentCalculationPeriod>
+                        <adjustedPaymentDate>${dateHelper.printDate(dateHelper.addMonths(effectiveStartDate,calculationPeriodMultiplier*loopIndex))}</adjustedPaymentDate>
+                        <calculationPeriod>
+                            <adjustedStartDate>${dateHelper.printDate(effectiveStartDate)}</adjustedStartDate>
+                            <adjustedEndDate>${dateHelper.printDate(effectiveEndDate)}</adjustedEndDate>
+                            <notionalAmount>${amount2?c}.00</notionalAmount>
+                            <floatingRateDefinition>
+                                <rateObservation>
+                                    <adjustedFixingDate>${dateHelper.printDate(dateHelper.addDays(effectiveStartDate,-2))}</adjustedFixingDate>
+                                    <observationWeight>1</observationWeight>
+                                </rateObservation>
+                            </floatingRateDefinition>
+                        </calculationPeriod>
+                    </paymentCalculationPeriod>
+                </#list>
+            </cashflows>
             </swapStream>
         </swap>
     </trade>
-
+    <party id="party1">
+        <partyId>${book.entityId}</partyId>
+        <partyName>${book.entityId}_Name</partyName>
+    </party>
+    <party id="party2">
+        <partyId>${party.partyId}</partyId>
+    </party>
     <book id="${book.bookId}">
         <type>${book.bookName}</type>
     </book>

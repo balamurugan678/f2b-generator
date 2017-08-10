@@ -79,29 +79,18 @@ public class SwapGenerator {
         root.put("book", book);
 
         // Select id and parties for trades
-        int numberOfTrades = random.nextInt(1,10);
-        Trade[] trades = new Trade[numberOfTrades];
         Set<Party> partiesUsed = new HashSet<>();
-        for(int i=0; i<numberOfTrades; i++) {
 
-            // Select random counter party
-            Party party = parties.get(random.nextInt(parties.size()));
-            if (!partiesUsed.contains(party)) {
-                partiesUsed.add(party);
-            }
-
-            // Select random exchange rate
-            ExchangeRate exchangeRate = exchangeRates.get(random.nextInt(exchangeRates.size()));
-            root.put("exchangeRate", exchangeRate);
-
-            // Create trade model
-            Trade trade = new Trade();
-            trade.setTradeId(randomHelper.numberDigits(12));
-            trade.setParty(party);
-            trade.setExchangeRate(exchangeRate);
-            trades[i] = trade;
+        // Select random counter party
+        Party party = parties.get(random.nextInt(parties.size()));
+        root.put("party", party);
+        if (!partiesUsed.contains(party)) {
+            partiesUsed.add(party);
         }
-        root.put("trades", trades);
+
+        // Select random exchange rate
+        ExchangeRate exchangeRate = exchangeRates.get(random.nextInt(exchangeRates.size()));
+        root.put("exchangeRate", exchangeRate);
         root.put("parties", partiesUsed);
 
         // Select template

@@ -35,51 +35,42 @@ public class Main {
         // Create solace helper
         //SolaceHelper solaceHelper = new SolaceHelper(SOLACE_HOST, SOLACE_VPN_NAME, SOLACE_USERNAME, SOLACE_PASSWORD);
         //solaceHelper.init();
+
         PubsubHelper pubsubHelper = new PubsubHelper();
 
-        // Create generator
-        Generator fxGenerator = new Generator("fx");
-        SwapGenerator swapGenerator = new SwapGenerator("rates");
+        generateSpotForward(pubsubHelper);
 
-        //for each day of last week, generate x trades
+        generateInvalidSpotForward(pubsubHelper);
+
+        generateSwap(pubsubHelper);
+    }
+
+    private static void generateInvalidSpotForward(PubsubHelper pubsubHelper) throws IOException, TemplateException {
+
+        boolean sendToPubsub = false;
+        boolean printToConsole = false;
+
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        //todo: skip weekend days (and holidays?)
-        LocalDate start = LocalDate.now().minusDays(5);
-        LocalDate end = LocalDate.now();
 
-        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
-            LocalTime startTime = LocalTime.of(07, 30);
-            LocalTime endTime = LocalTime.of(05, 30);
-            int messagesGenerated = 0;
-            for (LocalTime time = startTime; time.isBefore(endTime) || messagesGenerated < 5; time = time.plusMinutes(8 + random.nextInt(4)).plusNanos(random.nextInt(8, 1000000))) {
-                String xml = fxGenerator.next(date.atTime(time));
+        Generator fxGenerator = new Generator("fx");
 
-                //System.out.println(xml);
-
-                xml = swapGenerator.next(date.atTime(time));
-                System.out.println(xml);
-
-
-                //sendMessage(xml, solaceHelper, sequenceNumber);
-                //pubsubHelper.send(xml);
-
-                messagesGenerated++;
-            }
-        }
-
-
-        //Generate one invalid message
+        // Generate one invalid message
         String xml = fxGenerator.next(LocalDateTime.now().minusMinutes(10));
         //xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">.*?</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
         xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">PT0001</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
-        //System.out.println(xml);
+        if (printToConsole) {
+            System.out.println(xml);
+        }
         //pubsubHelper.send(xml);
 
-        //Generate a pair of duplicate messages
+        // Generate a pair of duplicate messages
         xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5));
-        //System.out.println(xml);
+        if (printToConsole) {
+            System.out.println(xml);
+        }
         //pubsubHelper.send(xml);
-        //replace correlationId
+
+        // Replace correlationId
         Pattern p = Pattern.compile(">(.*?)</correlationId>");
         Matcher m = p.matcher(xml);
         m.find();
@@ -92,14 +83,61 @@ public class Main {
         while (m2.find()) {
             xml.replaceAll(m.group(1), randomHelper.numberDigits(12)+"");
         }
-        //System.out.println(xml);
+        if (printToConsole) {
+            System.out.println(xml);
+        }
         //pubsubHelper.send(xml);
 
+    }
+
+    private static void generateSpotForward(PubsubHelper pubsubHelper) throws IOException, TemplateException, ExecutionException, InterruptedException {
+        Generator fxGenerator = new Generator("fx");
+
+        //for each day of last week, generate x trades
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        //todo: skip weekend days (and holidays?)
+        LocalDate start = LocalDate.now().minusDays(5);
+        LocalDate end = LocalDate.now();
+
+        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
+            LocalTime startTime = LocalTime.of(8, 0);
+            LocalTime endTime = LocalTime.of(17, 0);
+            int messagesGenerated = 0;
+            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < 5; time = time.plusMinutes(8 + random.nextInt(4)).plusNanos(random.nextInt(8, 1000000))) {
+                String xml = fxGenerator.next(date.atTime(time));
 
 
+                System.out.print(xml);
+                //pubsubHelper.send(xml);
 
+                messagesGenerated++;
+            }
+        }
+    }
 
+    private static void generateSwap(PubsubHelper pubsubHelper) throws IOException, TemplateException {
+        SwapGenerator swapGenerator = new SwapGenerator("rates");
 
+        //for each day of last week, generate x trades
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        //todo: skip weekend days (and holidays?)
+        LocalDate start = LocalDate.now().minusDays(5);
+        LocalDate end = LocalDate.now();
+
+        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
+            LocalTime startTime = LocalTime.of(8, 0);
+            LocalTime endTime = LocalTime.of(17, 0);
+            int messagesGenerated = 0;
+            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < 5; time = time.plusMinutes(8 + random.nextInt(4)).plusNanos(random.nextInt(8, 1000000))) {
+
+                String xml = swapGenerator.next(date.atTime(time));
+                //System.out.println(xml);
+
+                //pubsubHelper.send(xml);
+
+                messagesGenerated++;
+            }
+        }
     }
 
     private static void sendMessage(String payload, SolaceHelper solaceHelper, int seqNum) throws JCSMPException {

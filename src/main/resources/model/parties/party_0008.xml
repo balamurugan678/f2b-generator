@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 <counterpartyEntity xmlns:be2="http://be.bankx.com/ns/CounterpartyEntityMessage/2.0/">
     <messageHeader>
-        <publishedTime>2015-02-20T18:16:10.484Z</publishedTime>
+        <publishedTime>2015-02-20T18:13:10.484Z</publishedTime>
         <sourceSystem>Entity Central</sourceSystem>
         <originatingSystem>Entity Central</originatingSystem>
     </messageHeader>
     <messageBody>
         <main>
-            <partyId>PT0002</partyId>
-            <partyBIC>PTAPUS02</partyBIC>
+            <partyId>PT0008</partyId>
+            <partyBIC>PTAPUS08</partyBIC>
             <version>2</version>
             <verificationStatus>Verified</verificationStatus>
             <entityStatus>Active</entityStatus>
-            <effectiveFrom>2017-07-15</effectiveFrom>
+            <effectiveFrom>2017-06-16</effectiveFrom>
         </main>
-        <legalName>PNL BANK Limited</legalName>
+        <legalName>DRAGONS BANKING Limited</legalName>
         <subsidiary>false</subsidiary>
-        <countryOfHeadOffice>US</countryOfHeadOffice>
-        <countryOfIncorporation>US</countryOfIncorporation>
+        <countryOfHeadOffice>UK</countryOfHeadOffice>
+        <countryOfIncorporation>UK</countryOfIncorporation>
         <primarySicCode>6303</primarySicCode>
         <legality>Incorporated</legality>
         <customerBusinessType>Bank - Listed/Private</customerBusinessType>
-        <altName>Pnl bank</altName>
+        <altName>Dragons</altName>
     </messageBody>
 </counterpartyEntity>
