@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dealConfirmation
+        xmlns="http://www.fpml.org/FpML - 5/confirmation"
+        xmlns:xsi="http://ww.w3.org/2001/XMLSchema-instance" fpmlVersion="5-5" xsi:schemaLocation="http://www.fpml.org/FpML-5/confirmation ../../fpml-main-5-5.xsd http://www.w3.org/2000/09/xmldsig# ../../xmldsig-core-schema.xsd">
+    <header>
+        <messageId messageIdScheme="Http://www.bankx.com/msg_id">GCPFX${book.tradingRegion}${random.number(10000000000000, 99999999999999)?c}</messageId>
+        <sentBy>GCPFX</sentBy>
+        <sendTo>MQuad</sendTo>
+        <creationTimestamp>${timestamp}</creationTimestamp>
+    </header>
+    <isCorrection>false</isCorrection>
+    <correlationId correlationIDScheme="http://www.maplequadpocservice.com/coding-scheme/GCPFX:DealId">${dealId?c}</correlationId>
+    <originatingEvent>Basket:New</originatingEvent>
+    <trade>
+        <tradeHeader>
+            <partyTradeIdentifier>
+                <partyReference href="party1" />
+                <tradeId tradeIdScheme="http://www.partyA.com/swaps/trade-id">${random.numberDigits(12)?c}</tradeId>
+            </partyTradeIdentifier>
+            <partyTradeIdentifier>
+                <partyReference href="party2" />
+                <tradeId tradeIdScheme="http://www.partyB.com/swaps/trade-id">${random.numberDigits(12)?c}</tradeId>
+            </partyTradeIdentifier>
+            <tradeDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()?string["00"]}</tradeDate>
+        </tradeHeader>
+        <swap>
+            <swapStream>
+                <payerPartyReference href="party1"/>
+                <receiverPartyReference href="party2"/>
+                <calculationPeriodDates id="floatingCalcPeriodDates">
+                    <effectiveDate>
+                        <#assign rollConvention = timestamp.getDayOfMonth()+random.number(2,10)>
+                        <#assign effectiveDateStartYear = timestamp.getYear()>
+                        <#assign effectiveDateEndYear = effectiveDateStartYear+random.numberRangeMax2sf(50,500)/10>
+                        <unadjustedDate>${effectiveDateStartYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</unadjustedDate>
+                        <dateAdjustments>
+                            <businessDayConvention>NONE</businessDayConvention>
+                        </dateAdjustments>
+                    </effectiveDate>
+                    <terminationDate>
+                        <unadjustedDate>${effectiveDateEndYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</unadjustedDate>
+                        <dateAdjustments>
+                            <businessDayConvention>MODFOLLOWING</businessDayConvention>
+                            <businessCenters id="primaryBusinessCenters">
+                                <businessCenter>GBLO</businessCenter>
+                                <businessCenter>JPTO</businessCenter>
+                                <businessCenter>USNY</businessCenter>
+                            </businessCenters>
+                        </dateAdjustments>
+                    </terminationDate>
+                    <calculationPeriodDatesAdjustments>
+                        <businessDayConvention>MODFOLLOWING</businessDayConvention>
+                        <businessCentersReference href="primaryBusinessCenters"/>
+                    </calculationPeriodDatesAdjustments>
+                    <calculationPeriodFrequency>
+                        <periodMultiplier>
+                            <#assign calculationPeriodMultiplier = random.number(1,2)*3>
+                            <periodMultiplier>${calculationPeriodMultiplier}</periodMultiplier>
+                            <period>M</period>
+                            <rollConvention>${rollConvention}</rollConvention>
+                        </periodMultiplier>
+                    </calculationPeriodFrequency>
+                </calculationPeriodDates>
+                <paymentDates>
+                    <calculationPeriodDatesReference href="floatingCalcPeriodDates"/>
+                    <paymentFrequency>
+                        <periodMultiplier>${calculationPeriodMultiplier}</periodMultiplier>
+                        <period>M</period>
+                        <rollConvention>${rollConvention}</rollConvention>
+                    </paymentFrequency>
+                    <payRelativeTo>CalculationPeriodEndDate</payRelativeTo>
+                    <paymentDatesAdjsutments>
+                        <businessDayConvention>MODFOLLOWING</businessDayConvention>
+                        <businessCentersReference href="primaryBusinessCenters"/>
+                    </paymentDatesAdjsutments>
+                </paymentDates>
+                <resetDates id="resetDates">
+                    <calculationPeriodDatesReference href="floatingCalcPeriodicDates"/>
+                    <resetRelativeTo>CalculationPeriodStartDate</resetRelativeTo>
+                    <fixingDates>
+                        <periodMultiplier>-2</periodMultiplier>
+                        <period>D</period>
+                        <dayType>Business</dayType>
+                        <businessDayConvention>NONE</businessDayConvention>
+                        <businessCenters>
+                            <businessCenter>GBLO</businessCenter>
+                        </businessCenters>
+                        <dateRelativeTo href="resetDates"/>
+                    </fixingDates>
+                    <resetFrequency>
+                        <periodMultiplier>${calculationPeriodMultiplier}</periodMultiplier>
+                        <period>M</period>
+                    </resetFrequency>
+                    <resetDatesAdjustments>
+                        <businessDayConvention>MODFOLLOWING</businessDayConvention>
+                        <businessCentersReference href="primaryBusinessCenters"/>
+                    </resetDatesAdjustments>
+                </resetDates>
+                <calculationPeriodAmount>
+                    <calculation>
+                        <notionalSchedule>
+                            <notionalStepSchedule>
+                                <#assign amount1 = random.numberRangeMax2sf(10000000,95000000)>
+                                <#assign amount2 = amount1 * exchangeRate.rate>
+                                <initalValue>${amount1?c}.00</initalValue>
+                                <currency>${exchangeRate.currency1}</currency>
+                            </notionalStepSchedule>
+                        </notionalSchedule>
+                        <floatingRateCalculation>
+                            <floatingRateIndex>${exchangeRate.currency1}-LIBOR-BBA</floatingRateIndex>
+                            <indexTenor>
+                                <periodMultiplier>${calculationPeriodMultiplier}</periodMultiplier>
+                                <period>M</period>
+                            </indexTenor>
+                        </floatingRateCalculation>
+                        <dayCountFraction>ACT/360</dayCountFraction>
+                    </calculation>
+                </calculationPeriodAmount>
+                <principleExchanges>
+                    <initialExchange>true</initialExchange>
+                    <finalExchange>false</finalExchange>
+                    <intermediateExcahnge>false</intermediateExcahnge>
+                </principleExchanges>
+                <cashflows>
+                    <cashflowsMatchParameters>true</cashflowsMatchParameters>
+                    <principleExchange>
+                        <adjustedPrincipleExchangeDate>${effectiveDateStartYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</adjustedPrincipleExchangeDate>
+                        <principleExchangeAmount>-${amount1}</principleExchangeAmount>
+                    </principleExchange>
+                    <principleExchange>
+                        <adjustedPrincipleExchangeDate>${effectiveDateEndYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</adjustedPrincipleExchangeDate>
+                        <principleExchangeAmount>${amount1}</principleExchangeAmount>
+                    </principleExchange>
+                    <paymentCalculationPeriod>
+                        <adjustedPaymentDate></adjustedPaymentDate>
+                    </paymentCalculationPeriod>
+                </cashflows>
+            </swapStream>
+        </swap>
+    </trade>
+</dealConfirmation>

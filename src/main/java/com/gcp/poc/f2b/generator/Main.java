@@ -91,6 +91,13 @@ public class Main {
         System.out.println(xml);
         //pubsubHelper.send(xml);
 
+
+        start = LocalDate.now().minusYears(1);
+        end = start.plusDays(100);
+        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(10)) {
+
+        }
+
     }
 
     private static void sendMessage(String payload, SolaceHelper solaceHelper, int seqNum) throws JCSMPException {

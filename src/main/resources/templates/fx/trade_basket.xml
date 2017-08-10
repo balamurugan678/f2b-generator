@@ -12,7 +12,7 @@
     <onBehalfOf>
         <partyReference href="party1"/>
     </onBehalfOf>
-    <originatingEvent>Trade:Basket</originatingEvent>
+    <originatingEvent>Basket:New</originatingEvent>
     <#list trades as trade>
     <trade id="${trade.tradeId?c}">
         <tradeHeader>
