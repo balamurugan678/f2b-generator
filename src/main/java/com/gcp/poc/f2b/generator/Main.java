@@ -45,9 +45,9 @@ public class Main {
         generateSwap(pubsubHelper);
     }
 
-    private static void generateInvalidSpotForward(PubsubHelper pubsubHelper) throws IOException, TemplateException {
+    private static void generateInvalidSpotForward(PubsubHelper pubsubHelper) throws IOException, TemplateException, ExecutionException, InterruptedException {
 
-        boolean sendToPubsub = false;
+        boolean sendToPubsub = true;
         boolean printToConsole = false;
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -61,14 +61,16 @@ public class Main {
         if (printToConsole) {
             System.out.println(xml);
         }
-        //pubsubHelper.send(xml);
+        if (sendToPubsub) {
+            pubsubHelper.send(xml, "basket");
+        }
 
         // Generate a pair of duplicate messages
         xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5));
         if (printToConsole) {
             System.out.println(xml);
         }
-        //pubsubHelper.send(xml);
+        pubsubHelper.send(xml, "basket");
 
         // Replace correlationId
         Pattern p = Pattern.compile(">(.*?)</correlationId>");
@@ -86,7 +88,7 @@ public class Main {
         if (printToConsole) {
             System.out.println(xml);
         }
-        //pubsubHelper.send(xml);
+        pubsubHelper.send(xml,"basket");
 
     }
 
@@ -107,8 +109,8 @@ public class Main {
                 String xml = fxGenerator.next(date.atTime(time));
 
 
-                System.out.print(xml);
-                //pubsubHelper.send(xml);
+                //System.out.print(xml);
+                pubsubHelper.send(xml,"basket");
 
                 messagesGenerated++;
             }
@@ -133,7 +135,7 @@ public class Main {
                 String xml = swapGenerator.next(date.atTime(time));
                 //System.out.println(xml);
 
-                //pubsubHelper.send(xml);
+                //pubsubHelper.send(xml,"swap");
 
                 messagesGenerated++;
             }

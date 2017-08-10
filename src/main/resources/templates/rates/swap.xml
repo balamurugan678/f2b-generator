@@ -15,7 +15,7 @@
         <partyReference href="party1"/>
         <bookReference href="${book.bookId}"/>
     </onBehalfOf>
-    <originatingEvent>Basket:New</originatingEvent>
+    <originatingEvent>New</originatingEvent>
     <trade>
         <tradeHeader>
             <partyTradeIdentifier>
