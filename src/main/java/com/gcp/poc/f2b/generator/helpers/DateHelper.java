@@ -9,15 +9,19 @@ public class DateHelper {
         return date.plusDays(workingDays);
     }
 
-    public String PrintDate(LocalDateTime dateTime) {
-        return dateTime.getYear()+"-"+dateTime.getMonthValue()+"-"+dateTime.getDayOfMonth();
+    public String printDate(LocalDateTime dateTime) {
+        return dateTime.getYear()+"-"+String.format("%02d",dateTime.getMonthValue())+"-"+String.format("%02d",dateTime.getDayOfMonth());
     }
 
-    public LocalDateTime AddDays(LocalDateTime dateTime, int days) {
+    public LocalDateTime addDays(LocalDateTime dateTime, int days) {
         return dateTime.plusDays(days);
     }
 
-    public LocalDateTime AddMonths(LocalDateTime dateTime, int months) {
+    public LocalDateTime addMonths(LocalDateTime dateTime, int months) {
         return dateTime.plusMonths(months);
+    }
+
+    public LocalDateTime addYears(LocalDateTime dateTime, int years) {
+        return dateTime.plusYears(years);
     }
 }

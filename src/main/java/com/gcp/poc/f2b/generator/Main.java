@@ -39,6 +39,7 @@ public class Main {
 
         // Create generator
         Generator fxGenerator = new Generator("fx");
+        SwapGenerator swapGenerator = new SwapGenerator("rates");
 
         //for each day of last week, generate x trades
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -53,6 +54,9 @@ public class Main {
             for (LocalTime time = startTime; time.isBefore(endTime) || messagesGenerated < 5; time = time.plusMinutes(8 + random.nextInt(4)).plusNanos(random.nextInt(8, 1000000))) {
                 String xml = fxGenerator.next(date.atTime(time));
 
+                //System.out.println(xml);
+
+                xml = swapGenerator.next(date.atTime(time));
                 System.out.println(xml);
 
 
@@ -68,12 +72,12 @@ public class Main {
         String xml = fxGenerator.next(LocalDateTime.now().minusMinutes(10));
         //xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">.*?</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
         xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">PT0001</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
-        System.out.println(xml);
+        //System.out.println(xml);
         //pubsubHelper.send(xml);
 
         //Generate a pair of duplicate messages
         xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5));
-        System.out.println(xml);
+        //System.out.println(xml);
         //pubsubHelper.send(xml);
         //replace correlationId
         Pattern p = Pattern.compile(">(.*?)</correlationId>");
@@ -88,15 +92,13 @@ public class Main {
         while (m2.find()) {
             xml.replaceAll(m.group(1), randomHelper.numberDigits(12)+"");
         }
-        System.out.println(xml);
+        //System.out.println(xml);
         //pubsubHelper.send(xml);
 
 
-        start = LocalDate.now().minusYears(1);
-        end = start.plusDays(100);
-        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(10)) {
 
-        }
+
+
 
     }
 

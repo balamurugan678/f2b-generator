@@ -10,6 +10,11 @@
     </header>
     <isCorrection>false</isCorrection>
     <correlationId correlationIDScheme="http://www.maplequadpocservice.com/coding-scheme/GCPFX:DealId">${dealId?c}</correlationId>
+    <sequenceNumber>1</sequenceNumber>
+    <onBehalfOf>
+        <partyReference href="party1"/>
+        <bookReference href="${book.bookId}"/>
+    </onBehalfOf>
     <originatingEvent>Basket:New</originatingEvent>
     <trade>
         <tradeHeader>
@@ -21,7 +26,8 @@
                 <partyReference href="party2" />
                 <tradeId tradeIdScheme="http://www.partyB.com/swaps/trade-id">${random.numberDigits(12)?c}</tradeId>
             </partyTradeIdentifier>
-            <tradeDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()?string["00"]}</tradeDate>
+            <gtiVersion>gti_correlationid_${dealId?c}</gtiVersion>
+            <tradeDate>${dateHelper.printDate(timestamp)}</tradeDate>
         </tradeHeader>
         <swap>
             <swapStream>
@@ -29,16 +35,17 @@
                 <receiverPartyReference href="party2"/>
                 <calculationPeriodDates id="floatingCalcPeriodDates">
                     <effectiveDate>
-                        <#assign rollConvention = timestamp.getDayOfMonth()+random.number(2,10)>
-                        <#assign effectiveDateStartYear = timestamp.getYear()>
-                        <#assign effectiveDateEndYear = effectiveDateStartYear+random.numberRangeMax2sf(50,500)/10>
-                        <unadjustedDate>${effectiveDateStartYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</unadjustedDate>
+                        <#assign swapDurationYears = random.number(1,10)*5>
+                        <#assign effectiveStartDate = dateHelper.addDays(timestamp, random.number(2,10))>
+                        <#assign effectiveEndDate = dateHelper.addYears(effectiveStartDate, swapDurationYears)>
+                        <#assign rollConvention = effectiveStartDate.getDayOfMonth()>
+                        <unadjustedDate>${dateHelper.printDate(effectiveStartDate)}</unadjustedDate>
                         <dateAdjustments>
                             <businessDayConvention>NONE</businessDayConvention>
                         </dateAdjustments>
                     </effectiveDate>
                     <terminationDate>
-                        <unadjustedDate>${effectiveDateEndYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</unadjustedDate>
+                        <unadjustedDate>${dateHelper.printDate(effectiveEndDate)}</unadjustedDate>
                         <dateAdjustments>
                             <businessDayConvention>MODFOLLOWING</businessDayConvention>
                             <businessCenters id="primaryBusinessCenters">
@@ -124,18 +131,38 @@
                 <cashflows>
                     <cashflowsMatchParameters>true</cashflowsMatchParameters>
                     <principleExchange>
-                        <adjustedPrincipleExchangeDate>${effectiveDateStartYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</adjustedPrincipleExchangeDate>
-                        <principleExchangeAmount>-${amount1}</principleExchangeAmount>
+                        <adjustedPrincipleExchangeDate>${dateHelper.printDate(effectiveStartDate)}</adjustedPrincipleExchangeDate>
+                        <principleExchangeAmount>-${amount1?c}.00</principleExchangeAmount>
                     </principleExchange>
                     <principleExchange>
-                        <adjustedPrincipleExchangeDate>${effectiveDateEndYear?c}-${timestamp.getMonthValue()?string["00"]}-${rollConvention?string["00"]}</adjustedPrincipleExchangeDate>
-                        <principleExchangeAmount>${amount1}</principleExchangeAmount>
+                        <adjustedPrincipleExchangeDate>${dateHelper.printDate(effectiveEndDate)}</adjustedPrincipleExchangeDate>
+                        <principleExchangeAmount>${amount1?c}.00</principleExchangeAmount>
                     </principleExchange>
+                    <#list 1..(swapDurationYears*12/calculationPeriodMultiplier) as loopIndex>
                     <paymentCalculationPeriod>
-                        <adjustedPaymentDate></adjustedPaymentDate>
+                        <adjustedPaymentDate>${dateHelper.printDate(dateHelper.addMonths(effectiveStartDate,calculationPeriodMultiplier*loopIndex))}</adjustedPaymentDate>
+                        <calculationPeriod>
+                            <adjustedStartDate>${dateHelper.printDate(effectiveStartDate)}</adjustedStartDate>
+                            <adjustedEndDate>${dateHelper.printDate(effectiveEndDate)}</adjustedEndDate>
+                            <notionalAmount>${amount1?c}.00</notionalAmount>
+                            <floatingRateDefinition>
+                                <rateObservation>
+                                    <adjustedFixingDate>${dateHelper.printDate(dateHelper.addDays(effectiveStartDate,-2))}</adjustedFixingDate>
+                                    <observationWeight>1</observationWeight>
+                                </rateObservation>
+                            </floatingRateDefinition>
+                        </calculationPeriod>
                     </paymentCalculationPeriod>
+                    </#list>
                 </cashflows>
+            </swapStream>
+            <swapStream>
+                
             </swapStream>
         </swap>
     </trade>
+
+    <book id="${book.bookId}">
+        <type>${book.bookName}</type>
+    </book>
 </dealConfirmation>
