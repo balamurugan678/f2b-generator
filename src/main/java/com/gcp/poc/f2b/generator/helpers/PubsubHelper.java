@@ -24,8 +24,8 @@ public class PubsubHelper {
     public PubsubHelper() throws IOException {
         // Settings for publisher
         BatchingSettings batchingSettings = BatchingSettings.newBuilder()
-                .setDelayThreshold(Duration.ofMillis(100))
-                .setRequestByteThreshold(10000L)
+                .setDelayThreshold(Duration.ofMillis(10))
+                .setRequestByteThreshold(1000L)
                 .setElementCountThreshold(100L)
                 .build();
 

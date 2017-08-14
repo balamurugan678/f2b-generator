@@ -2,10 +2,7 @@ package com.gcp.poc.f2b.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.xml.XmlMapper;
-import com.gcp.poc.f2b.generator.helpers.BasketGeneratorHelper;
-import com.gcp.poc.f2b.generator.helpers.PubsubHelper;
-import com.gcp.poc.f2b.generator.helpers.RandomHelper;
-import com.gcp.poc.f2b.generator.helpers.SolaceHelper;
+import com.gcp.poc.f2b.generator.helpers.*;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
 import freemarker.template.TemplateException;
@@ -44,49 +41,10 @@ public class Main {
         BasketGeneratorHelper basketGeneratorHelper = new BasketGeneratorHelper(pubsubHelper);
         basketGeneratorHelper.generate(100);
 
-
-        //generateSwap(pubsubHelper, true);
+        SwapGeneratorHelper swapGeneratorHelper = new SwapGeneratorHelper(pubsubHelper);
+        swapGeneratorHelper.generate(100);
     }
 
-    private static void generateSwap(PubsubHelper pubsubHelper, boolean sendToPubSub) throws IOException, TemplateException, ExecutionException, InterruptedException {
-        SwapGenerator swapGenerator = new SwapGenerator("rates");
-
-        List<ApiFuture<String>>  messageIdFutures = new ArrayList<>();
-
-        //for each day of last week, generate x trades
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        //todo: skip weekend days (and holidays?)
-        LocalDate start = LocalDate.now().minusDays(5);
-        LocalDate end = LocalDate.now();
-
-        long timerStart = System.nanoTime();
-        System.out.println("Start sending swaps");
-        int totalMessagesSent = 0;
-        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
-            LocalTime startTime = LocalTime.of(8, 0);
-            LocalTime endTime = LocalTime.of(17, 0);
-            int messagesGenerated = 0;
-            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < 50; time = time.plusMinutes(0 + random.nextInt(3)).plusNanos(random.nextInt(8, 1000000))) {
-
-                String xml = swapGenerator.next(date.atTime(time));
-                //System.out.println(xml);
-
-                if (sendToPubSub) {
-                    ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "swap");
-                    messageIdFutures.add(messageIdFuture);
-                }
-
-                messagesGenerated++;
-                totalMessagesSent++;
-            }
-        }
-
-        // Wait for pubsub message acks
-        ApiFutures.allAsList(messageIdFutures).get();
-
-        long timerEnd = System.nanoTime();
-        System.out.println("Sent: " + totalMessagesSent + " swaps in " + (timerEnd - timerStart)/1000000 + "ms");
-    }
 
 //    private static void sendMessage(String payload, SolaceHelper solaceHelper, int seqNum) throws JCSMPException {
 //        TextMessage message = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
@@ -109,12 +67,4 @@ public class Main {
 //
 //        solaceHelper.sendMessage(message);
 //    }
-
-    private static String xmlToJson(String xml) throws IOException {
-        XmlMapper xmlMapper = new XmlMapper();
-        JsonNode node = xmlMapper.readTree(xml.getBytes());
-        ObjectMapper jsonMapper = new ObjectMapper();
-        String json = jsonMapper.writeValueAsString(node);
-        return json;
-    }
 }
