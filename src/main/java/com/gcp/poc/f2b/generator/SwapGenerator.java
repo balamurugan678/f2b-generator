@@ -37,7 +37,8 @@ public class SwapGenerator {
 
     private final ThreadLocalRandom random;
 
-    public SwapGenerator(String templateFolder) throws IOException {
+    public SwapGenerator() throws IOException {
+        String templateFolder = "rates";
         random = ThreadLocalRandom.current();
 
         // Load models

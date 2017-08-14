@@ -32,7 +32,8 @@ public class BasketGeneratorHelper {
     }
 
     public void generateInvalidParty(boolean sendToPubsub, boolean printToConsole, String partyNameToInvalidate) throws IOException, TemplateException, ExecutionException, InterruptedException {
-        String xml = basketGenerator.next(LocalDateTime.now().minusMinutes(10));
+        LocalDateTime dateTime  = LocalDateTime.now().minusMinutes(10);
+        String xml = basketGenerator.next(dateTime);
         xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">" + partyNameToInvalidate + "</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
 
         if (printToConsole) {
@@ -40,7 +41,7 @@ public class BasketGeneratorHelper {
         }
 
         if (sendToPubsub) {
-            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket");
+            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket", dateTime.toLocalDate());
             System.out.println("Published 1 invalid basket with message ID: " + messageIdFuture.get());
         } else  {
             System.out.println("Generated 1 invalid basket");
@@ -49,14 +50,15 @@ public class BasketGeneratorHelper {
 
     public void generateDuplicatePair(boolean sendToPubsub, boolean printToConsole) throws IOException, TemplateException, ExecutionException, InterruptedException {
         // Generate first message
-        String xml = basketGenerator.next(LocalDateTime.now().minusMinutes(5));
+        LocalDateTime dateTime  = LocalDateTime.now().minusMinutes(5);
+        String xml = basketGenerator.next(dateTime);
 
         if (printToConsole) {
             System.out.println(xml);
             System.out.println();
         }
         if (sendToPubsub) {
-            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket");
+            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket", dateTime.toLocalDate());
             messageIdFuture.get();
         }
 
@@ -79,7 +81,7 @@ public class BasketGeneratorHelper {
             System.out.println(xml);
         }
         if (sendToPubsub) {
-            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket");
+            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket", dateTime.toLocalDate());
             messageIdFuture.get();
         }
 
@@ -108,13 +110,21 @@ public class BasketGeneratorHelper {
             LocalTime endTime = LocalTime.of(17, 0);
             int messagesGenerated = 0;
             List<ApiFuture<String>> messageIdFutures = new ArrayList<>();
-            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < messagesPerDay; time = time.plusMinutes(0 + random.nextInt(3)).plusNanos(random.nextInt(8, 1000000))) {
+            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < messagesPerDay; time = time./*plusMinutes(0 + random.nextInt(3)).*/plusNanos(random.nextInt(8, 1000000))) {
                 String xml = basketGenerator.next(date.atTime(time));
 
-                ApiFuture<String> messageIdFuture = pubsubHelper.send(xml,"basket");
+                ApiFuture<String> messageIdFuture = pubsubHelper.send(xml,"basket", date);
                 messageIdFutures.add(messageIdFuture);
 
                 messagesGenerated++;
+
+                // workaround for DEADLINE_EXCEEDED runtime exception
+                if (messagesGenerated % 300 == 0) {
+                    List<String> acks = ApiFutures.allAsList(messageIdFutures).get();
+                    messageIdFutures.clear();
+                    totalMessagesSent += acks.size();
+                    System.out.println("Sent " + totalMessagesSent + "/" + messages + " baskets in " + (System.nanoTime() - timerStart)/1000000 + "ms");
+                }
             }
 
             // Wait for pubsub message acks

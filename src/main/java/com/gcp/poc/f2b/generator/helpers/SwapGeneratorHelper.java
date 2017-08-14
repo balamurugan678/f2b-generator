@@ -21,7 +21,7 @@ public class SwapGeneratorHelper {
     private ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public SwapGeneratorHelper(PubsubHelper pubsubHelper) throws IOException {
-        swapGenerator = new SwapGenerator("rates");
+        swapGenerator = new SwapGenerator();
         this.pubsubHelper = pubsubHelper;
     }
 
@@ -46,16 +46,16 @@ public class SwapGeneratorHelper {
             LocalTime endTime = LocalTime.of(17, 0);
             int messagesGenerated = 0;
             List<ApiFuture<String>> messageIdFutures = new ArrayList<>();
-            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < messagesPerDay; time = time.plusMinutes(0 + random.nextInt(3)).plusNanos(random.nextInt(8, 1000000))) {
+            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < messagesPerDay; time = time.plusNanos(random.nextInt(8, 1000000))) {
                 String xml = swapGenerator.next(date.atTime(time));
 
-                ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "swap");
+                ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "swap", date);
                 messageIdFutures.add(messageIdFuture);
 
                 messagesGenerated++;
 
                 // workaround for DEADLINE_EXCEEDED runtime exception
-                if (messagesGenerated % 100 == 0) {
+                if (messagesGenerated % 50 == 0) {
                     List<String> acks = ApiFutures.allAsList(messageIdFutures).get();
                     messageIdFutures.clear();
                     totalMessagesSent += acks.size();

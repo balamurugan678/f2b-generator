@@ -19,7 +19,7 @@ public class SwapGeneratorHelperTest {
 
     @Test
     public void generateMany() throws IOException, InterruptedException, ExecutionException, TemplateException {
-        swapGeneratorHelper.generate(2500);
+        swapGeneratorHelper.generate(25000);
     }
 
     @Test

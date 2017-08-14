@@ -24,7 +24,7 @@ public class BasketGeneratorHelperTest {
 
     @Test
     public void generateMany() throws IOException, InterruptedException, ExecutionException, TemplateException {
-        basketGeneratorHelper.generate(2500);
+        basketGeneratorHelper.generate(25000);
     }
 
     @Test

@@ -12,6 +12,8 @@ import com.google.pubsub.v1.TopicName;
 import org.threeten.bp.Duration;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 
 public class PubsubHelper {
@@ -35,9 +37,13 @@ public class PubsubHelper {
                 .build();
     }
 
-    public ApiFuture<String> send(String message, String messageType) throws IOException, ExecutionException, InterruptedException {
+    public ApiFuture<String> send(String message, String messageType, LocalDate tradeDate) throws IOException, ExecutionException, InterruptedException {
         ByteString data = ByteString.copyFromUtf8(message);
-        PubsubMessage pubsubMessage = PubsubMessage.newBuilder().putAttributes("messageType",messageType).setData(data).build();
+        PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
+                .putAttributes("messageType",messageType)
+                .putAttributes("tradeDate",tradeDate.toString())
+                .setData(data)
+                .build();
         ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
 
         return messageIdFuture;
