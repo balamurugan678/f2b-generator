@@ -3,7 +3,6 @@ package com.gcp.poc.f2b.generator.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.xml.XmlMapper;
 import com.google.cloud.bigquery.*;
-import com.sun.tools.javah.Gen;
 
 import java.io.IOException;
 import java.util.HashMap;

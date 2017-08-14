@@ -1,6 +1,7 @@
 package com.gcp.poc.f2b.generator;
 
 import com.fasterxml.jackson.xml.XmlMapper;
+import com.gcp.poc.f2b.generator.helpers.DateHelper;
 import com.gcp.poc.f2b.generator.helpers.RandomHelper;
 import com.gcp.poc.f2b.generator.model.Book;
 import com.gcp.poc.f2b.generator.model.ExchangeRate;
@@ -22,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Generator {
+public class BasketGenerator {
 
     private final Configuration configuration;
 
@@ -34,7 +35,8 @@ public class Generator {
 
     private final ThreadLocalRandom random;
 
-    public Generator(String templateFolder) throws IOException {
+    public BasketGenerator() throws IOException {
+        String templateFolder = "fx";
         random = ThreadLocalRandom.current();
 
         // Load models
@@ -63,6 +65,7 @@ public class Generator {
     public String next(LocalDateTime dateTime) throws IOException, TemplateException {
         Map<String, Object> root = new HashMap<>();
         root.put("timestamp", dateTime);
+        root.put("dateHelper", new DateHelper());
 
         // Add random helper and dealId to template
         RandomHelper randomHelper = new RandomHelper(random);
@@ -74,7 +77,7 @@ public class Generator {
         root.put("book", book);
 
         // Select id and parties for trades
-        int numberOfTrades = random.nextInt(1,10);
+        int numberOfTrades = random.nextInt(2,10);
         Trade[] trades = new Trade[numberOfTrades];
         Set<Party> partiesUsed = new HashSet<>();
         for(int i=0; i<numberOfTrades; i++) {

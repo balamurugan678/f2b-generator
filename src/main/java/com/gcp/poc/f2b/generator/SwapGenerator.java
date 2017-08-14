@@ -6,7 +6,6 @@ import com.gcp.poc.f2b.generator.helpers.RandomHelper;
 import com.gcp.poc.f2b.generator.model.Book;
 import com.gcp.poc.f2b.generator.model.ExchangeRate;
 import com.gcp.poc.f2b.generator.model.Party;
-import com.gcp.poc.f2b.generator.model.Trade;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

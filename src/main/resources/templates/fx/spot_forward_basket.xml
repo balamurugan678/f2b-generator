@@ -54,7 +54,7 @@
             <productType productTypeSchem="http://www.fpml.org/coding-scheme/product-taxonomy">ForeignExchange:<#if book.bookName=='Spot_Book'>Spot<#else>Forward</#if></productType>
             <exchangeCurrency1>
                 <payerPartyReference href="party2"/>
-                <receiverParyReference href="party1"/>
+                <receiverPartyReference href="party1"/>
                 <receiverBookReference href="${book.bookId}"/>
                 <paymentAmount>
                     <currency>${trade.exchangeRate.currency1}</currency>
@@ -65,17 +65,17 @@
             </exchangeCurrency1>
             <exchangeCurrency2>
                 <payerPartyReference href="party1"/>
-                <receiverParyReference href="party2"/>
-                <receiverBookReference href="${book.bookId}"/>
+                <receiverPartyReference href="party2"/>
+                <payerBookReference href="${book.bookId}"/>
                 <paymentAmount>
                     <currency>${trade.exchangeRate.currency2}</currency>
                     <amount>${amount2?c}</amount>
                 </paymentAmount>
-            </exchangeCurrency2>
+             </exchangeCurrency2>
             <#if book.bookName=='Spot_Book'>
-            <valueDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()+2?string["00"]}</valueDate>
+            <valueDate>${dateHelper.printDate(dateHelper.addDays(timestamp, 2))}</valueDate>
             <#else>
-            <valueDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()+random.number(3,100)?string["00"]}</valueDate>
+            <valueDate>${dateHelper.printDate(dateHelper.addDays(timestamp, random.number(3,100)))}</valueDate>
             </#if>
             <exchangeRate>
                 <quoteCurrencyPair>
