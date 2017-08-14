@@ -46,7 +46,7 @@ public class SwapGeneratorHelper {
             LocalTime endTime = LocalTime.of(17, 0);
             int messagesGenerated = 0;
             List<ApiFuture<String>> messageIdFutures = new ArrayList<>();
-            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < messagesPerDay; time = time.plusNanos(random.nextInt(8, 1000000))) {
+            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < messagesPerDay; time = time.plusNanos(random.nextInt(8, 5000000))) {
                 String xml = swapGenerator.next(date.atTime(time));
 
                 ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "swap", date);
