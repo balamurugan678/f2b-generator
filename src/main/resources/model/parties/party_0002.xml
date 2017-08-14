@@ -14,13 +14,13 @@
             <entityStatus>Active</entityStatus>
             <effectiveFrom>2017-07-15</effectiveFrom>
         </main>
-        <legalName>PNL BANK Limited</legalName>
+        <legalName>INT BANK Limited</legalName>
         <subsidiary>false</subsidiary>
         <countryOfHeadOffice>US</countryOfHeadOffice>
         <countryOfIncorporation>US</countryOfIncorporation>
         <primarySicCode>6303</primarySicCode>
         <legality>Incorporated</legality>
         <customerBusinessType>Bank - Listed/Private</customerBusinessType>
-        <altName>Pnl bank</altName>
+        <altName>Int bank</altName>
     </messageBody>
 </counterpartyEntity>

@@ -14,13 +14,13 @@
             <entityStatus>Active</entityStatus>
             <effectiveFrom>2017-06-16</effectiveFrom>
         </main>
-        <legalName>IMADISBOSS BANK Limited</legalName>
+        <legalName>IMAD BANK Limited</legalName>
         <subsidiary>false</subsidiary>
         <countryOfHeadOffice>US</countryOfHeadOffice>
         <countryOfIncorporation>US</countryOfIncorporation>
         <primarySicCode>6303</primarySicCode>
         <legality>Incorporated</legality>
         <customerBusinessType>Bank - Listed/Private</customerBusinessType>
-        <altName>Imadisbo</altName>
+        <altName>Imad</altName>
     </messageBody>
 </counterpartyEntity>

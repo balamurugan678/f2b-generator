@@ -1,6 +1,5 @@
 package com.gcp.poc.f2b.generator.helpers;
 
-import com.sun.tools.internal.xjc.model.Model;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,5 +9,11 @@ public class ModelHelperTest {
     public void generatePartyCSV() throws IOException {
         ModelHelper modelHelper = new ModelHelper();
         System.out.println(modelHelper.generatePartyCSV());
+    }
+
+    @Test
+    public void generateBookCSV() throws IOException {
+        ModelHelper modelHelper = new ModelHelper();
+        System.out.println(modelHelper.generateBookCSV());
     }
 }
