@@ -27,12 +27,8 @@ public class BasketGeneratorHelper {
         this.pubsubHelper = pubsubHelper;
     }
 
-    public void generateInvalidParty() throws InterruptedException, TemplateException, ExecutionException, IOException {
-        this.generateInvalidParty(true, false);
-    }
-
     public void generateInvalidParty(boolean sendToPubsub, boolean printToConsole) throws InterruptedException, TemplateException, ExecutionException, IOException {
-        this.generateInvalidParty(true, false, "PT0001");
+        this.generateInvalidParty(sendToPubsub, printToConsole, "PT0001");
     }
 
     public void generateInvalidParty(boolean sendToPubsub, boolean printToConsole, String partyNameToInvalidate) throws IOException, TemplateException, ExecutionException, InterruptedException {
@@ -72,10 +68,10 @@ public class BasketGeneratorHelper {
         RandomHelper randomHelper = new RandomHelper(random);
         xml = xml.replace(tradeId, randomHelper.numberDigits(12)+"");
         //replace tradeIds
-        Pattern p2 = Pattern.compile("<trade id=\"(\\d12)\">");
+        Pattern p2 = Pattern.compile("<trade id=\"(\\d{12})\">");
         Matcher m2 = p2.matcher(xml);
         while (m2.find()) {
-            xml.replaceAll(m.group(1), randomHelper.numberDigits(12)+"");
+            xml = xml.replaceAll(m2.group(1), randomHelper.numberDigits(12)+"");
         }
 
         // Send duplicate message with Ids replaced

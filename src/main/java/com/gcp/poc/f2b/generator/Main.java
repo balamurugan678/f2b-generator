@@ -41,99 +41,11 @@ public class Main {
 
         PubsubHelper pubsubHelper = new PubsubHelper();
 
-        generateSpotForward(pubsubHelper);
+        BasketGeneratorHelper basketGeneratorHelper = new BasketGeneratorHelper(pubsubHelper);
+        basketGeneratorHelper.generate(100);
 
-        //generateInvalidSpotForward(pubsubHelper);
 
         //generateSwap(pubsubHelper, true);
-
-        //BasketGeneratorHelper basketGeneratorHelper = new BasketGeneratorHelper(pubsubHelper);
-        //basketGeneratorHelper.generate(100);
-    }
-
-    private static void generateInvalidSpotForward(PubsubHelper pubsubHelper) throws IOException, TemplateException, ExecutionException, InterruptedException {
-
-        boolean sendToPubsub = true;
-        boolean printToConsole = false;
-
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-
-        BasketGenerator fxGenerator = new BasketGenerator();
-
-        // Generate one invalid message
-        String xml = fxGenerator.next(LocalDateTime.now().minusMinutes(10));
-        //xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">.*?</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
-        xml = xml.replaceFirst("<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">PT0001</partyId>", "<partyId partyIDScheme=\"http://www.fpml.org/coding-scheme/LegalEntity\">INVALID_PARTY</partyId>");
-        if (printToConsole) {
-            System.out.println(xml);
-        }
-        if (sendToPubsub) {
-            pubsubHelper.send(xml, "basket");
-        }
-
-        // Generate a pair of duplicate messages
-        xml = fxGenerator.next(LocalDateTime.now().minusMinutes(5));
-        if (printToConsole) {
-            System.out.println(xml);
-        }
-        pubsubHelper.send(xml, "basket");
-
-        // Replace correlationId
-        Pattern p = Pattern.compile(">(.*?)</correlationId>");
-        Matcher m = p.matcher(xml);
-        m.find();
-        String tradeId = m.group(1);
-        RandomHelper randomHelper = new RandomHelper(random);
-        xml = xml.replace(tradeId, randomHelper.numberDigits(12)+"");
-        //replace tradeIds
-        Pattern p2 = Pattern.compile("<trade id=\"(\\d12)\">");
-        Matcher m2 = p2.matcher(xml);
-        while (m2.find()) {
-            xml.replaceAll(m.group(1), randomHelper.numberDigits(12)+"");
-        }
-        if (printToConsole) {
-            System.out.println(xml);
-        }
-        pubsubHelper.send(xml,"basket");
-
-        System.out.println("Sent 3 invalid baskets");
-    }
-
-    private static void generateSpotForward(PubsubHelper pubsubHelper) throws IOException, TemplateException, ExecutionException, InterruptedException {
-        BasketGenerator basketGenerator = new BasketGenerator();
-
-        List<ApiFuture<String>>  messageIdFutures = new ArrayList<>();
-
-        //for each day of last week, generate x trades
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        //todo: skip weekend days (and holidays?)
-        LocalDate start = LocalDate.now().minusDays(5);
-        LocalDate end = LocalDate.now();
-
-        long timerStart = System.nanoTime();
-        System.out.println("Start sending baskets");
-        int totalMessagesSent = 0;
-        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
-            LocalTime startTime = LocalTime.of(8, 0);
-            LocalTime endTime = LocalTime.of(17, 0);
-            int messagesGenerated = 0;
-            for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < 50; time = time.plusMinutes(0 + random.nextInt(3)).plusNanos(random.nextInt(8, 1000000))) {
-                String xml = basketGenerator.next(date.atTime(time));
-
-                //System.out.print(xml);
-                ApiFuture<String> messageIdFuture = pubsubHelper.send(xml,"basket");
-                messageIdFutures.add(messageIdFuture);
-
-                messagesGenerated++;
-                totalMessagesSent++;
-            }
-        }
-
-        // Wait for pubsub message acks
-        ApiFutures.allAsList(messageIdFutures).get();
-
-        long timerEnd = System.nanoTime();
-        System.out.println("sent " + totalMessagesSent + " baskets in " + (timerEnd - timerStart)/1000000 + "ms");
     }
 
     private static void generateSwap(PubsubHelper pubsubHelper, boolean sendToPubSub) throws IOException, TemplateException, ExecutionException, InterruptedException {

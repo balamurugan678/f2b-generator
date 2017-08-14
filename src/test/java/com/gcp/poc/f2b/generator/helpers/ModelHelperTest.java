@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class ModelHelperTest {
     @Test
-    public void generateCSV() throws IOException {
+    public void generatePartyCSV() throws IOException {
         ModelHelper modelHelper = new ModelHelper();
         System.out.println(modelHelper.generatePartyCSV());
     }

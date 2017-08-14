@@ -31,4 +31,14 @@ public class BasketGeneratorHelperTest {
     public void generateFive() throws InterruptedException, TemplateException, ExecutionException, IOException {
         basketGeneratorHelper.generate(5);
     }
+
+    @Test
+    public void generateInvalidParty() throws InterruptedException, TemplateException, ExecutionException, IOException {
+        basketGeneratorHelper.generateInvalidParty(true, false);
+    }
+
+    @Test
+    public void generateDuplicatePair() throws InterruptedException, TemplateException, ExecutionException, IOException {
+        basketGeneratorHelper.generateDuplicatePair(true, false);
+    }
 }
