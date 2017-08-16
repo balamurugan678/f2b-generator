@@ -18,9 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PubsubHelper {
 
-    //private TopicName topicName = TopicName.create("gcp-f2brb", "f2b_fx_trades_topic");
-    //private TopicName topicName = TopicName.create("gcp-f2brb", "f2b_store_basket_topic");
-    private TopicName topicName = TopicName.create("gcp-f2brb", "f2b_inbound_trade_topic");
+    private TopicName topicName = TopicName.create("gcp-f2brb", "f2b_321_inlet_topic");
     private Publisher publisher;
 
     public PubsubHelper() throws IOException {
@@ -41,7 +39,7 @@ public class PubsubHelper {
         ByteString data = ByteString.copyFromUtf8(message);
         PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
                 .putAttributes("messageType",messageType)
-                .putAttributes("tradeDate",tradeDate.toString())
+                .putAttributes("creationDate",tradeDate.toString().replaceAll("-",""))
                 .setData(data)
                 .build();
         ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);

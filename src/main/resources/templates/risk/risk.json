@@ -1,0 +1,43 @@
+{
+  "riskSource": {
+    "hsbctradeId": "GTI${tradeId?c}",
+    "tradeId": "${tradeId?c}",
+    "sourceSystemClass": "FI",
+    "sourceSystemName": "vs",
+    "sourceIdentifier": "Risk_Delta_HSBCHK_ByTrade_APCCCY_VS_20170410_20170407",
+    "sourceFormatType": "FILE",
+    "riskSourceType": "TRADELEG"
+  },
+  "valuationDate": "${dateHelper.printDate(timestamp)}",
+  "validTo": 9999123123595,
+  "validFrom": 20170800212000,
+  "measure": {
+    "name": "IRDELTA",
+    "class": "SENSITIVITY",
+    "snapshotcode": "BOD",
+    "stateStatus": "OK",
+    "unitName": "CNY",
+    "unitAssetType": "CURRENCY"
+  },
+  "valuationContext": {
+    "valuationContextId": "0",
+    "description": "Valuation context description",
+    "batchName": "Risk_Delta_HSBCHK_ByTrade_APCCY_VS_20170410_20170407",
+    "batchTimeStamp": 20170410130511,
+    "transformTimeStamp": 20170606152300,
+    "sourceRiskEngineName": "vs"
+  },
+  "marketContext": {
+    "marketContextName": "20170407",
+    "marketContextSetId": "APCCCY",
+    "marketContextTimeStamp": "20170407000000"
+  },
+  "riskFactor1": {
+    "type": "IRCURVE",
+    "curveCurrency": "${exchangeRate.currency1}",
+    "curveIndex": "LIBO6"
+  },
+  "axisPoints":[
+
+  ]
+}

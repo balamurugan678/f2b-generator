@@ -64,7 +64,7 @@ public class SwapGenerator {
         templates = this.loadTemplates(configuration, templateFolder);
     }
 
-    public String next(LocalDateTime dateTime) throws IOException, TemplateException {
+    public Map<String, Object> nextData(LocalDateTime dateTime) {
         Map<String, Object> root = new HashMap<>();
         root.put("dateHelper", new DateHelper());
         root.put("timestamp", dateTime);
@@ -73,6 +73,8 @@ public class SwapGenerator {
         RandomHelper randomHelper = new RandomHelper(random);
         root.put("random", randomHelper);
         root.put("dealId", randomHelper.numberDigits(12));
+        root.put("tradeId1", randomHelper.numberDigits(12));
+        root.put("tradeId2", randomHelper.numberDigits(12));
 
         // Select random book
         Book book = books.get(random.nextInt(books.size()));
@@ -93,12 +95,17 @@ public class SwapGenerator {
         root.put("exchangeRate", exchangeRate);
         root.put("parties", partiesUsed);
 
+        return root;
+    }
+
+    public String next(Map<String, Object> data) throws IOException, TemplateException {
+
         // Select template
         Template template = templates.get(random.nextInt(templates.size()));
 
         // todo: configurable: write output (converted to json) straight to big query or straight to solace
         Writer out = new StringWriter();//new OutputStreamWriter(System.out);
-        template.process(root, out);
+        template.process(data, out);
 
         return out.toString();
     }

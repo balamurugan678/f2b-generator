@@ -62,7 +62,7 @@ public class BasketGenerator {
         templates = this.loadTemplates(configuration, templateFolder);
     }
 
-    public String next(LocalDateTime dateTime) throws IOException, TemplateException {
+    public Map<String, Object> nextData(LocalDateTime dateTime) {
         Map<String, Object> root = new HashMap<>();
         root.put("timestamp", dateTime);
         root.put("dateHelper", new DateHelper());
@@ -101,6 +101,10 @@ public class BasketGenerator {
         root.put("trades", trades);
         root.put("parties", partiesUsed);
 
+        return root;
+    }
+
+    public String next(Map<String, Object> root) throws IOException, TemplateException {
         // Select template
         Template template = templates.get(random.nextInt(templates.size()));
 

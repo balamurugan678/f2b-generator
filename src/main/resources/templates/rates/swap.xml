@@ -18,11 +18,11 @@
         <tradeHeader>
             <partyTradeIdentifier>
                 <partyReference href="party1" />
-                <tradeId tradeIdScheme="http://www.partyA.com/swaps/trade-id">${random.numberDigits(12)?c}</tradeId>
+                <tradeId tradeIdScheme="http://www.partyA.com/swaps/trade-id">${tradeId1?c}</tradeId>
             </partyTradeIdentifier>
             <partyTradeIdentifier>
                 <partyReference href="party2" />
-                <tradeId tradeIdScheme="http://www.partyB.com/swaps/trade-id">${random.numberDigits(12)?c}</tradeId>
+                <tradeId tradeIdScheme="http://www.partyB.com/swaps/trade-id">${tradeId2?c}</tradeId>
             </partyTradeIdentifier>
             <gtiVersion>gti_correlationid_${dealId?c}</gtiVersion>
             <tradeDate>${dateHelper.printDate(timestamp)}</tradeDate>

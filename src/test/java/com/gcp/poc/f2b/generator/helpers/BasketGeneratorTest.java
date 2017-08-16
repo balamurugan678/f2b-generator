@@ -5,13 +5,17 @@ import freemarker.template.TemplateException;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public class BasketGeneratorTest {
     @Test
     public void generateOnePrintToConsole() throws IOException, TemplateException {
         BasketGenerator basketGenerator = new BasketGenerator();
-        String xml = basketGenerator.next(LocalDateTime.now());
+        Map<String, Object> data = basketGenerator.nextData(LocalDateTime.now());
+        String xml = basketGenerator.next(data);
+
         System.out.println(xml);
     }
 }
