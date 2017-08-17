@@ -154,6 +154,13 @@ public class BasketGeneratorHelper {
                     basketMessageIdFutures.add(messageIdFuture2);
                     messagesGenerated++;
                     totalAmendmentsSent++;
+
+                    // Send risk entry (with incremented version)
+                    for (String riskEntry : riskEntries) {
+                        String riskEntry2 = riskEntry.replace("\"version\": \"1\"","\"version\": \"2\"");
+                        messageIdFuture = pubsubHelper.send(riskEntry2, "risk", date);
+                        riskMessageIdFutures.add(messageIdFuture);
+                    }
                 }
 
                 // workaround for DEADLINE_EXCEEDED runtime exception

@@ -2,6 +2,7 @@
   "riskSource": {
     "hsbctradeId": "GTI${tradeId?c}",
     "tradeId": "${tradeId?c}",
+    "version": "1",
     "sourceSystemClass": "FI",
     "sourceSystemName": "vs",
     "sourceIdentifier": "Risk_Delta_HSBCHK_ByTrade_APCCCY_VS_20170410_20170407",
