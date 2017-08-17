@@ -135,7 +135,6 @@ public class BasketGeneratorHelper {
                 List<String> riskEntries = riskHelper.getBasketEntries(data);
 
                 // Send basket
-                ApiFuture<String> messageIdFuture;
                 ApiFuture<String> messageIdFuture = pubsubHelper.send(xml,"basket", date);
                 basketMessageIdFutures.add(messageIdFuture);
 
