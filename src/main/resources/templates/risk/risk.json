@@ -2,12 +2,15 @@
   "riskSource": {
     "hsbctradeId": "GTI${tradeId?c}",
     "tradeId": "${tradeId?c}",
-    "version": "1",
-    "sourceSystemClass": "FI",
-    "sourceSystemName": "vs",
+    "tradeVersion": "1",
+    "tradeLegId": "${tradeId?c}",
+    "sourceSystemClass": "${book.businessLine}",
+    "sourceSystemName": "${book.sourceSystem}",
     "sourceIdentifier": "Risk_Delta_HSBCHK_ByTrade_APCCCY_VS_20170410_20170407",
     "sourceFormatType": "FILE",
-    "riskSourceType": "TRADELEG"
+    "riskSourceType": "TRADELEG",
+    "bookId": "${book.bookId}",
+    "counterpartyId": "${counterpartyId}"
   },
   "valuationDate": "${dateHelper.printDate(timestamp)}",
   "validTo": 9999123123595,
@@ -17,7 +20,7 @@
     "class": "SENSITIVITY",
     "snapshotcode": "BOD",
     "stateStatus": "OK",
-    "unitName": "CNY",
+    "unitName": "${exchangeRate.currency1}",
     "unitAssetType": "CURRENCY"
   },
   "valuationContext": {

@@ -22,12 +22,14 @@ public class BasketGeneratorHelper {
     private BasketGenerator basketGenerator;
     private PubsubHelper pubsubHelper;
     private RiskHelper riskHelper;
+    private DateHelper dateHelper;
     private ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public BasketGeneratorHelper(PubsubHelper pubsubHelper) throws IOException {
         basketGenerator = new BasketGenerator();
         this.pubsubHelper = pubsubHelper;
         riskHelper = new RiskHelper();
+        dateHelper = new DateHelper();
     }
 
     public void generateInvalidParty(boolean sendToPubsub, boolean printToConsole) throws InterruptedException, TemplateException, ExecutionException, IOException {
@@ -115,7 +117,7 @@ public class BasketGeneratorHelper {
 
         //for each day of last week, generate x trades
         //todo: skip weekend days (and holidays?)
-        LocalDate start = LocalDate.now().minusDays(5);
+        LocalDate start = dateHelper.minusWorkingDays(LocalDate.now(), 5);
         LocalDate end = LocalDate.now();
 
         long timerStart = System.nanoTime();
@@ -123,7 +125,7 @@ public class BasketGeneratorHelper {
         int totalBasketMessagesSent = 0;
         int totalRiskMessagesSent = 0;
         int totalAmendmentsSent = 0;
-        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
+        for (LocalDate date = start; date.isBefore(end); date = dateHelper.addWorkingDays(date, 1)) {
             LocalTime startTime = LocalTime.of(8, 0);
             LocalTime endTime = LocalTime.of(17, 0);
             int messagesGenerated = 0;
@@ -157,7 +159,7 @@ public class BasketGeneratorHelper {
 
                     // Send risk entry (with incremented version)
                     for (String riskEntry : riskEntries) {
-                        String riskEntry2 = riskEntry.replace("\"version\": \"1\"","\"version\": \"2\"");
+                        String riskEntry2 = riskEntry.replace("\"tradeVersion\": \"1\"","\"tradeVersion\": \"2\"");
                         messageIdFuture = pubsubHelper.send(riskEntry2, "risk", date);
                         riskMessageIdFutures.add(messageIdFuture);
                     }

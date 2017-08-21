@@ -20,11 +20,13 @@ public class SwapGeneratorHelper {
     private PubsubHelper pubsubHelper;
     private ThreadLocalRandom random = ThreadLocalRandom.current();
     private RiskHelper riskHelper;
+    private DateHelper dateHelper;
 
     public SwapGeneratorHelper(PubsubHelper pubsubHelper) throws IOException {
         swapGenerator = new SwapGenerator();
         this.pubsubHelper = pubsubHelper;
         riskHelper = new RiskHelper();
+        dateHelper = new DateHelper();
     }
 
     // Sends a number of messages over the last 5 days
@@ -37,7 +39,7 @@ public class SwapGeneratorHelper {
 
         //for each day of last week, generate x trades
         //todo: skip weekend days (and holidays?)
-        LocalDate start = LocalDate.now().minusDays(5);
+        LocalDate start = dateHelper.minusWorkingDays(LocalDate.now(), 5);
         LocalDate end = LocalDate.now();
 
         long timerStart = System.nanoTime();
@@ -45,7 +47,7 @@ public class SwapGeneratorHelper {
         int totalSwapMessagesSent = 0;
         int totalRiskMessagesSent = 0;
         int totalAmendmentsSent = 0;
-        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
+        for (LocalDate date = start; date.isBefore(end); date = dateHelper.addWorkingDays(date, 1)) {
             LocalTime startTime = LocalTime.of(8, 0);
             LocalTime endTime = LocalTime.of(17, 0);
             int messagesGenerated = 0;
@@ -76,7 +78,7 @@ public class SwapGeneratorHelper {
                     totalAmendmentsSent++;
 
                     // Send risk entry (with incremented version)
-                    String riskEntry2 = riskEntry.replace("\"version\": \"1\"","\"version\": \"2\"");
+                    String riskEntry2 = riskEntry.replace("\"tradeVersion\": \"1\"","\"tradeVersion\": \"2\"");
                     messageIdFuture = pubsubHelper.send(riskEntry2, "risk", date);
                     riskMessageIdFutures.add(messageIdFuture);
                 }

@@ -47,7 +47,7 @@
                 <executionVenueType>SEF</executionVenueType>
                 <confirmationMethod>Facility</confirmationMethod>
             </partyTradeInformation>
-            <tradeDate>${timestamp.getYear()?c}-${timestamp.getMonthValue()?string["00"]}-${timestamp.getDayOfMonth()?string["00"]}</tradeDate>
+            <tradeDate>${dateHelper.printDate(timestamp)}</tradeDate>
         </tradeHeader>
         <fxSingleLeg>
             <primaryAssetClass>ForiegnExchange</primaryAssetClass>
@@ -73,9 +73,9 @@
                 </paymentAmount>
              </exchangeCurrency2>
             <#if book.bookName=='Spot_Book'>
-            <valueDate>${dateHelper.printDate(dateHelper.addDays(timestamp, 2))}</valueDate>
+            <valueDate>${dateHelper.printDate(dateHelper.addWorkingDays(timestamp.toLocalDate(), 2).atTime(0,0))}</valueDate>
             <#else>
-            <valueDate>${dateHelper.printDate(dateHelper.addDays(timestamp, random.number(3,100)))}</valueDate>
+            <valueDate>${dateHelper.printDate(dateHelper.addWorkingDays(timestamp.toLocalDate(), random.number(3,100)).atTime(0,0))}</valueDate>
             </#if>
             <exchangeRate>
                 <quoteCurrencyPair>

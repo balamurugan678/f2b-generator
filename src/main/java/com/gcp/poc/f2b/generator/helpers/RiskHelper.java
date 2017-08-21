@@ -1,6 +1,7 @@
 package com.gcp.poc.f2b.generator.helpers;
 
 import com.gcp.poc.f2b.generator.Main;
+import com.gcp.poc.f2b.generator.model.Party;
 import com.gcp.poc.f2b.generator.model.Trade;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -44,6 +45,8 @@ public class RiskHelper {
             root.put("tradeId", trade.getTradeId());
             root.put("timestamp", data.get("timestamp"));
             root.put("exchangeRate", trade.getExchangeRate());
+            root.put("book", data.get("book"));
+            root.put("counterpartyId", trade.getParty().getPartyId());
 
             Writer out = new StringWriter();
             template.process(root, out);
@@ -60,6 +63,8 @@ public class RiskHelper {
         root.put("tradeId", data.get("tradeId1"));
         root.put("timestamp", data.get("timestamp"));
         root.put("exchangeRate", data.get("exchangeRate"));
+        root.put("book", data.get("book"));
+        root.put("counterpartyId", ((Party)data.get("party")).getPartyId());
 
         Writer out = new StringWriter();
         template.process(root, out);
