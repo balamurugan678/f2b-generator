@@ -1,6 +1,7 @@
 package com.gcp.poc.f2b.generator.helpers;
 
 import com.gcp.poc.f2b.generator.Main;
+import com.gcp.poc.f2b.generator.model.ExchangeRate;
 import com.gcp.poc.f2b.generator.model.Party;
 import com.gcp.poc.f2b.generator.model.Trade;
 import freemarker.template.Configuration;
@@ -80,6 +81,7 @@ public class RiskHelper {
         root.put("exchangeRate", data.get("exchangeRate"));
         root.put("book", data.get("book"));
         root.put("counterpartyId", ((Party)data.get("party")).getPartyId());
+        root.put("currency", ((ExchangeRate)data.get("exchangeRate")).getCurrency1());
         root.put("amount", data.get("amount"));
 
         Writer out = new StringWriter();

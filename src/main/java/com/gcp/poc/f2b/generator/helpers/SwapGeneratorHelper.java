@@ -56,15 +56,15 @@ public class SwapGeneratorHelper {
             for (LocalTime time = startTime; time.isBefore(endTime) && messagesGenerated < messagesPerDay; time = time.plusNanos(random.nextInt(8, 5000000))) {
                 Map<String, Object> data = swapGenerator.nextData(date.atTime(time));
                 String xml = swapGenerator.next(data);
-                String riskEntry = riskHelper.getSwapEntry(data);
+                //String riskEntry = riskHelper.getSwapEntry(data);
 
                 // Send swap trade
                 ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "swap", date);
                 swapMessageIdFutures.add(messageIdFuture);
 
                 // Send risk entry
-                messageIdFuture = pubsubHelper.send(riskEntry, "risk", date);
-                riskMessageIdFutures.add(messageIdFuture);
+                //messageIdFuture = pubsubHelper.send(riskEntry, "risk", date);
+                //riskMessageIdFutures.add(messageIdFuture);
 
                 messagesGenerated++;
 
@@ -78,9 +78,9 @@ public class SwapGeneratorHelper {
                     totalAmendmentsSent++;
 
                     // Send risk entry (with incremented version)
-                    String riskEntry2 = riskEntry.replace("\"tradeVersion\": \"1\"","\"tradeVersion\": \"2\"");
-                    messageIdFuture = pubsubHelper.send(riskEntry2, "risk", date);
-                    riskMessageIdFutures.add(messageIdFuture);
+                    //String riskEntry2 = riskEntry.replace("\"tradeVersion\": \"1\"","\"tradeVersion\": \"2\"");
+                    //messageIdFuture = pubsubHelper.send(riskEntry2, "risk", date);
+                    //riskMessageIdFutures.add(messageIdFuture);
                 }
 
 
