@@ -58,9 +58,7 @@
                 <receiverBookReference href="${book.bookId}"/>
                 <paymentAmount>
                     <currency>${trade.exchangeRate.currency1}</currency>
-                    <#assign amount1 = random.numberRangeMax2sf(10000000,95000000)>
-                    <#assign amount2 = amount1 * trade.exchangeRate.rate>
-                    <amount>${amount1?c}</amount>
+                    <amount>${trade.amount1?c}</amount>
                 </paymentAmount>
             </exchangeCurrency1>
             <exchangeCurrency2>
@@ -69,7 +67,7 @@
                 <payerBookReference href="${book.bookId}"/>
                 <paymentAmount>
                     <currency>${trade.exchangeRate.currency2}</currency>
-                    <amount>${amount2?c}</amount>
+                    <amount>${trade.amount2?c}</amount>
                 </paymentAmount>
              </exchangeCurrency2>
             <#if book.bookName=='Spot_Book'>

@@ -47,8 +47,17 @@ public class RiskHelper {
             root.put("exchangeRate", trade.getExchangeRate());
             root.put("book", data.get("book"));
             root.put("counterpartyId", trade.getParty().getPartyId());
+            root.put("currency", trade.getExchangeRate().getCurrency1());
+            root.put("amount", trade.getAmount1());
 
             Writer out = new StringWriter();
+            template.process(root, out);
+            basketEntries.add(out.toString());
+
+            // Generate risk entry for reverse cashflow
+            root.put("currency", trade.getExchangeRate().getCurrency2());
+            root.put("amount", trade.getAmount2());
+            out = new StringWriter();
             template.process(root, out);
             basketEntries.add(out.toString());
         }
@@ -65,6 +74,7 @@ public class RiskHelper {
         root.put("exchangeRate", data.get("exchangeRate"));
         root.put("book", data.get("book"));
         root.put("counterpartyId", ((Party)data.get("party")).getPartyId());
+        root.put("amount", data.get("amount"));
 
         Writer out = new StringWriter();
         template.process(root, out);

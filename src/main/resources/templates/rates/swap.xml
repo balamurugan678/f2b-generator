@@ -105,8 +105,6 @@
                     <calculation>
                         <notionalSchedule>
                             <notionalStepSchedule>
-                                <#assign amount1 = random.numberRangeMax2sf(10000000,95000000)>
-                                <#assign amount2 = amount1 * exchangeRate.rate>
                                 <initalValue>${amount1?c}.00</initalValue>
                                 <currency>${exchangeRate.currency1}</currency>
                             </notionalStepSchedule>

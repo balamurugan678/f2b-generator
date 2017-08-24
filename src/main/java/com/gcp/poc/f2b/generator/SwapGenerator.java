@@ -95,6 +95,12 @@ public class SwapGenerator {
         root.put("exchangeRate", exchangeRate);
         root.put("parties", partiesUsed);
 
+        // Generate random amount
+        long amount1 = randomHelper.numberRangeMax2sf(10000000,95000000);
+        long amount2 = Math.round(amount1 * exchangeRate.getRate());
+        root.put("amount1", amount1);
+        root.put("amount2", amount2);
+
         return root;
     }
 

@@ -91,11 +91,17 @@ public class BasketGenerator {
             // Select random exchange rate
             ExchangeRate exchangeRate = exchangeRates.get(random.nextInt(exchangeRates.size()));
 
+            // Generate random amount
+            long amount1 = randomHelper.numberRangeMax2sf(10000000,95000000);
+            long amount2 = Math.round(amount1 * exchangeRate.getRate());
+
             // Create trade model
             Trade trade = new Trade();
             trade.setTradeId(randomHelper.numberDigits(12));
             trade.setParty(party);
             trade.setExchangeRate(exchangeRate);
+            trade.setAmount1(amount1);
+            trade.setAmount2(amount2);
             trades[i] = trade;
         }
         root.put("trades", trades);

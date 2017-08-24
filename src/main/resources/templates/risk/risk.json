@@ -6,7 +6,8 @@
     "tradeLegId": "${tradeId?c}",
     "sourceSystemClass": "${book.businessLine}",
     "sourceSystemName": "${book.sourceSystem}",
-    "sourceIdentifier": "Risk_Delta_HSBCHK_ByTrade_APCCCY_VS_20170410_20170407",
+    <#assign nextDay = dateHelper.addWorkingDays(timestamp.toLocalDate(), 1)>
+    "sourceIdentifier": "FX_Delta_HSBCHK_ByTrade_APCCY_VS_${nextDay.getYear()?c}${nextDay.getMonthValue()?string("00")}${nextDay.getDayOfMonth()?string("00")}_${timestamp.getYear()?c}${timestamp.getMonthValue()?string("00")}${timestamp.getDayOfMonth()?string("00")}",
     "sourceFormatType": "FILE",
     "riskSourceType": "TRADELEG",
     "bookId": "${book.bookId}",
@@ -14,21 +15,21 @@
   },
   "valuationDate": "${dateHelper.printDate(timestamp)}",
   "validTo": 9999123123595,
-  "validFrom": 20170800212000,
+  "validFrom": ${nextDay.getYear()?c}${nextDay.getMonthValue()?string("00")}${nextDay.getDayOfMonth()?string("00")}080000,
   "measure": {
-    "name": "IRDELTA",
+    "name": "FXDEL",
     "class": "SENSITIVITY",
     "snapshotcode": "BOD",
     "stateStatus": "OK",
-    "unitName": "${exchangeRate.currency1}",
+    "unitName": "${currency}",
     "unitAssetType": "CURRENCY"
   },
   "valuationContext": {
     "valuationContextId": "0",
     "description": "Valuation context description",
-    "batchName": "Risk_Delta_HSBCHK_ByTrade_APCCY_VS_20170410_20170407",
-    "batchTimeStamp": 20170410130511,
-    "transformTimeStamp": 20170606152300,
+    "batchName": "FX_Delta_HSBCHK_ByTrade_APCCY_VS_${nextDay.getYear()?c}${nextDay.getMonthValue()?string("00")}${nextDay.getDayOfMonth()?string("00")}_${timestamp.getYear()?c}${timestamp.getMonthValue()?string("00")}${timestamp.getDayOfMonth()?string("00")}",
+    "batchTimeStamp": ${timestamp.getYear()?c}${timestamp.getMonthValue()?string("00")}${timestamp.getDayOfMonth()?string("00")}090000,
+    "transformTimeStamp": ${nextDay.getYear()?c}${nextDay.getMonthValue()?string("00")}${nextDay.getDayOfMonth()?string("00")}080000,
     "sourceRiskEngineName": "vs"
   },
   "marketContext": {
@@ -37,11 +38,15 @@
     "marketContextTimeStamp": "20170407000000"
   },
   "riskFactor1": {
-    "type": "IRCURVE",
-    "curveCurrency": "${exchangeRate.currency1}",
-    "curveIndex": "LIBO6"
+    "type": "UNDERLYING",
+    "instrumentType": "FX",
+    "instrumentSymbol": "${exchangeRate.currency1}/${exchangeRate.currency2}",
+    "instrumentSymbol": "${exchangeRate.currency1}${exchangeRate.currency2}"
   },
-  "axisPoints":[
-
-  ]
+  "axisPoints":[{
+    "xAxisPoints": {},
+    "yAxisPoints": {},
+    "zAxisPoints": {},
+    "measureValue": "${(amount*0.1)?c}"
+  }]
 }

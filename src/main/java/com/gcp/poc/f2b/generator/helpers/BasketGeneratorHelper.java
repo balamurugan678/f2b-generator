@@ -60,7 +60,7 @@ public class BasketGeneratorHelper {
             List<String> messageIds = ApiFutures.allAsList(messageIdFutures).get();
             System.out.println("Published " + messageIds.size() + " risk message");
         } else  {
-            System.out.println("Generated 1 invalid basket and 1 risk message");
+            System.out.println("Generated 1 invalid basket and " + riskEntries.size() + " risk message(s)");
         }
     }
 

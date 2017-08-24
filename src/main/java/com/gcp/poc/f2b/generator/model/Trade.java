@@ -5,6 +5,8 @@ public class Trade {
     private Book book;
     private Party party;
     private ExchangeRate exchangeRate;
+    private long amount1;
+    private long amount2;
 
     public long getTradeId() {
         return tradeId;
@@ -36,5 +38,21 @@ public class Trade {
 
     public void setExchangeRate(ExchangeRate exchangeRate) {
         this.exchangeRate = exchangeRate;
+    }
+
+    public long getAmount1() {
+        return amount1;
+    }
+
+    public void setAmount1(long amount1) {
+        this.amount1 = amount1;
+    }
+
+    public long getAmount2() {
+        return amount2;
+    }
+
+    public void setAmount2(long amount2) {
+        this.amount2 = amount2;
     }
 }

@@ -34,7 +34,7 @@ public class BasketGeneratorHelperTest {
 
     @Test
     public void generateInvalidParty() throws InterruptedException, TemplateException, ExecutionException, IOException {
-        basketGeneratorHelper.generateInvalidParty(true, false);
+        basketGeneratorHelper.generateInvalidParty(false, true);
     }
 
     @Test
