@@ -47,6 +47,6 @@
     "xAxisPoints": {},
     "yAxisPoints": {},
     "zAxisPoints": {},
-    "measureValue": "${(amount*0.1)?c}"
+    "measureValue": "${(amount*(random.number(1,10)/100)+1)?c}"
   }]
 }

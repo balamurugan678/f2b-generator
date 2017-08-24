@@ -16,9 +16,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RiskHelper {
     private final Template template;
+    private final RandomHelper randomHelper;
 
     public RiskHelper() throws IOException {
         // Start free marker
@@ -33,6 +35,8 @@ public class RiskHelper {
         configuration.setLogTemplateExceptions(false);
 
         template = loadTemplate(configuration);
+
+        randomHelper = new RandomHelper(ThreadLocalRandom.current());
     }
 
     public List<String> getBasketEntries(Map<String, Object> data) throws IOException, TemplateException {
@@ -41,6 +45,7 @@ public class RiskHelper {
         Trade[] trades = (Trade[])data.get("trades");
         for(Trade trade : trades) {
             Map<String, Object> root = new HashMap<>();
+            root.put("random", randomHelper);
             root.put("dateHelper", new DateHelper());
             root.put("tradeId", trade.getTradeId());
             root.put("timestamp", data.get("timestamp"));
@@ -68,6 +73,7 @@ public class RiskHelper {
     public String getSwapEntry(Map<String, Object> data) throws IOException, TemplateException {
 
         Map<String, Object> root = new HashMap<>();
+        root.put("random", randomHelper);
         root.put("dateHelper", new DateHelper());
         root.put("tradeId", data.get("tradeId1"));
         root.put("timestamp", data.get("timestamp"));
