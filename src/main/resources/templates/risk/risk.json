@@ -41,12 +41,12 @@
     "type": "UNDERLYING",
     "instrumentType": "FX",
     "instrumentSymbol": "${exchangeRate.currency1}/${exchangeRate.currency2}",
-    "instrumentSymbol": "${exchangeRate.currency1}${exchangeRate.currency2}"
+    "instrumentName": "${exchangeRate.currency1}${exchangeRate.currency2}"
   },
   "axisPoints":[{
-    "xAxisPoints": {},
-    "yAxisPoints": {},
-    "zAxisPoints": {},
+    "xAxisPoints": "0",
+    "yAxisPoints": "0",
+    "zAxisPoints": "0",
     "measureValue": "${(amount*(random.number(1,10)/100)+1)?c}"
   }]
 }
