@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PubsubHelper {
 
-    private TopicName topicName = TopicName.create("gcp-f2brb", "f2b_321_inlet_topic");
+    private TopicName topicName = TopicName.create("gcp-f2brb", "f2b_demo_inlet_topic1");
     private Publisher publisher;
 
     public PubsubHelper() throws IOException {

@@ -33,9 +33,9 @@
     "sourceRiskEngineName": "vs"
   },
   "marketContext": {
-    "marketContextName": "20170407",
+    "marketContextName": "${timestamp.getYear()?c}${timestamp.getMonthValue()?string("00")}${timestamp.getDayOfMonth()?string("00")}",
     "marketContextSetId": "APCCCY",
-    "marketContextTimeStamp": "20170407000000"
+    "marketContextTimeStamp": "${timestamp.getYear()?c}${timestamp.getMonthValue()?string("00")}${timestamp.getDayOfMonth()?string("00")}000000"
   },
   "riskFactor1": {
     "type": "UNDERLYING",
@@ -47,6 +47,6 @@
     "xAxisPoints": "0",
     "yAxisPoints": "0",
     "zAxisPoints": "0",
-    "measureValue": "${(amount*(random.number(1,10)/100)+1)?c}"
+    "measureValue": "${(amount*(random.number(1,10)/100)+1)?string("0")}"
   }]
 }
