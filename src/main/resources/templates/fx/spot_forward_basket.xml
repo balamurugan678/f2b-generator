@@ -25,7 +25,7 @@
                 <partyReference href="party1"/>
                 <bookReference href="${book.bookId}"/>
                 <relatedParty>
-                    <partyReference href="party2"/>
+                    <partyReference href="${trade.party.partyId}"/>
                     <role>Counterparty</role>
                 </relatedParty>
                 <relatedBusinessUnitReference>
@@ -53,7 +53,7 @@
             <primaryAssetClass>ForiegnExchange</primaryAssetClass>
             <productType productTypeSchem="http://www.fpml.org/coding-scheme/product-taxonomy">ForeignExchange:<#if book.bookName=='Spot_Book'>Spot<#else>Forward</#if></productType>
             <exchangeCurrency1>
-                <payerPartyReference href="party2"/>
+                <payerPartyReference href="${trade.party.partyId}"/>
                 <receiverPartyReference href="party1"/>
                 <receiverBookReference href="${book.bookId}"/>
                 <paymentAmount>
@@ -63,7 +63,7 @@
             </exchangeCurrency1>
             <exchangeCurrency2>
                 <payerPartyReference href="party1"/>
-                <receiverPartyReference href="party2"/>
+                <receiverPartyReference href="${trade.party.partyId}"/>
                 <payerBookReference href="${book.bookId}"/>
                 <paymentAmount>
                     <currency>${trade.exchangeRate.currency2}</currency>
