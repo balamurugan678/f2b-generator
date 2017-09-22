@@ -14,12 +14,14 @@ import java.util.concurrent.ExecutionException;
 public class BasketGeneratorHelperTest {
 
     private PubsubHelper pubsubHelper;
+    private BigTableHelper bigTableHelper;
     private BasketGeneratorHelper basketGeneratorHelper;
 
     @Before
     public void init() throws IOException {
         pubsubHelper = new PubsubHelper();
-        basketGeneratorHelper = new BasketGeneratorHelper(pubsubHelper);
+        bigTableHelper = new BigTableHelper();
+        basketGeneratorHelper = new BasketGeneratorHelper(pubsubHelper, bigTableHelper);
     }
 
     @Test

@@ -14,6 +14,9 @@ import org.threeten.bp.Duration;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class PubsubHelper {
@@ -35,12 +38,33 @@ public class PubsubHelper {
                 .build();
     }
 
+    /*
     public ApiFuture<String> send(String message, String messageType, LocalDate tradeDate) throws IOException, ExecutionException, InterruptedException {
         ByteString data = ByteString.copyFromUtf8(message);
         PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
                 .putAttributes("messageType",messageType)
                 .putAttributes("creationDate",tradeDate.toString().replaceAll("-",""))
                 .setData(data)
+                .build();
+        ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
+
+        return messageIdFuture;
+    }*/
+
+    public ApiFuture<String> send(String uuid, String messageType, String messageFormat, LocalDate date) {
+        ByteString data = ByteString.copyFromUtf8(uuid);
+        Map<String, String> attributes = new HashMap();
+        attributes.put("uuid",uuid);
+        attributes.put("messageType",messageType);
+        attributes.put("messageFormat",messageFormat);
+        attributes.put("creationDate",date.toString().replaceAll("-",""));
+        PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
+                .putAllAttributes(attributes)
+                /*.putAttributes("uuid",uuid)
+                .putAttributes("messageType",messageType)
+                .putAttributes("messageFormat",messageFormat)
+                .putAttributes("creationDate",date.toString().replaceAll("-",""))*/
+                .setData(data)  // note: we set data anyway because some direct runner can't handle null data
                 .build();
         ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
 

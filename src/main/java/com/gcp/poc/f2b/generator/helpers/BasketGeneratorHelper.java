@@ -21,13 +21,15 @@ public class BasketGeneratorHelper {
 
     private BasketGenerator basketGenerator;
     private PubsubHelper pubsubHelper;
+    private BigTableHelper bigTableHelper;
     private RiskHelper riskHelper;
     private DateHelper dateHelper;
     private ThreadLocalRandom random = ThreadLocalRandom.current();
 
-    public BasketGeneratorHelper(PubsubHelper pubsubHelper) throws IOException {
+    public BasketGeneratorHelper(PubsubHelper pubsubHelper, BigTableHelper bigTableHelper) throws IOException {
         basketGenerator = new BasketGenerator();
         this.pubsubHelper = pubsubHelper;
+        this.bigTableHelper = bigTableHelper;
         riskHelper = new RiskHelper();
         dateHelper = new DateHelper();
     }
@@ -51,11 +53,13 @@ public class BasketGeneratorHelper {
         }
 
         if (sendToPubsub) {
-            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket", dateTime.toLocalDate());
+            String uuid = bigTableHelper.write(xml,"basket", "xml", dateTime.toLocalDate());
+            ApiFuture<String> messageIdFuture = pubsubHelper.send(uuid, "basket", "xml", dateTime.toLocalDate());
             System.out.println("Published 1 invalid basket with message ID: " + messageIdFuture.get());
             List<ApiFuture<String>> messageIdFutures = new ArrayList<>();
             for(String riskEntry:riskEntries) {
-                messageIdFutures.add(pubsubHelper.send(riskEntry, "risk", dateTime.toLocalDate()));
+                uuid = bigTableHelper.write(riskEntry, "risk", "json", dateTime.toLocalDate());
+                messageIdFutures.add(pubsubHelper.send(uuid, "risk", "json", dateTime.toLocalDate()));
             }
             List<String> messageIds = ApiFutures.allAsList(messageIdFutures).get();
             System.out.println("Published " + messageIds.size() + " risk message");
@@ -76,7 +80,8 @@ public class BasketGeneratorHelper {
             System.out.println();
         }
         if (sendToPubsub) {
-            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket", dateTime.toLocalDate());
+            String uuid = bigTableHelper.write(xml, "basket", "xml", dateTime.toLocalDate());
+            ApiFuture<String> messageIdFuture = pubsubHelper.send(uuid, "basket", "xml", dateTime.toLocalDate());
             messageIdFuture.get();
         }
 
@@ -99,7 +104,8 @@ public class BasketGeneratorHelper {
             System.out.println(xml);
         }
         if (sendToPubsub) {
-            ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "basket", dateTime.toLocalDate());
+            String uuid = bigTableHelper.write(xml, "basket", "xml", dateTime.toLocalDate());
+            ApiFuture<String> messageIdFuture = pubsubHelper.send(uuid, "basket", "xml", dateTime.toLocalDate());
             messageIdFuture.get();
         }
 
@@ -137,12 +143,14 @@ public class BasketGeneratorHelper {
                 List<String> riskEntries = riskHelper.getBasketEntries(data);
 
                 // Send basket
-                ApiFuture<String> messageIdFuture = pubsubHelper.send(xml,"basket", date);
+                String uuid = bigTableHelper.write(xml, "basket", "xml", date);
+                ApiFuture<String> messageIdFuture = pubsubHelper.send(uuid, "basket", "xml", date);
                 basketMessageIdFutures.add(messageIdFuture);
 
                 // Send risk entry
                 for (String riskEntry : riskEntries) {
-                    messageIdFuture = pubsubHelper.send(riskEntry, "risk", date);
+                    uuid = bigTableHelper.write(riskEntry, "risk", "json", date);
+                    messageIdFuture = pubsubHelper.send(uuid, "risk", "json", date);
                     riskMessageIdFutures.add(messageIdFuture);
                 }
 
@@ -152,7 +160,8 @@ public class BasketGeneratorHelper {
                 boolean amendTrade = random.nextInt(0,1000) == 0;
                 if (amendTrade) {
                     String xml2 = xml.replace("<sequenceNumber>1</sequenceNumber>","<sequenceNumber>2</sequenceNumber>");
-                    ApiFuture<String> messageIdFuture2 = pubsubHelper.send(xml2,"basket", date);
+                    String uuid2 = bigTableHelper.write(xml2, "basket", "xml", date);
+                    ApiFuture<String> messageIdFuture2 = pubsubHelper.send(uuid2, "basket", "xml", date);
                     basketMessageIdFutures.add(messageIdFuture2);
                     messagesGenerated++;
                     totalAmendmentsSent++;
@@ -160,7 +169,8 @@ public class BasketGeneratorHelper {
                     // Send risk entry (with incremented version)
                     for (String riskEntry : riskEntries) {
                         String riskEntry2 = riskEntry.replace("\"tradeVersion\": \"1\"","\"tradeVersion\": \"2\"");
-                        messageIdFuture = pubsubHelper.send(riskEntry2, "risk", date);
+                        uuid = bigTableHelper.write(riskEntry2, "risk", "json", date);
+                        messageIdFuture = pubsubHelper.send(uuid, "risk", "json", date);
                         riskMessageIdFutures.add(messageIdFuture);
                     }
                 }

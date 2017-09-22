@@ -9,12 +9,14 @@ import java.util.concurrent.ExecutionException;
 
 public class SwapGeneratorHelperTest {
     private PubsubHelper pubsubHelper;
+    private BigTableHelper bigTableHelper;
     private SwapGeneratorHelper swapGeneratorHelper;
 
     @Before
     public void init() throws IOException {
         pubsubHelper = new PubsubHelper();
-        swapGeneratorHelper = new SwapGeneratorHelper(pubsubHelper);
+        bigTableHelper = new BigTableHelper();
+        swapGeneratorHelper = new SwapGeneratorHelper(pubsubHelper, bigTableHelper);
     }
 
     @Test

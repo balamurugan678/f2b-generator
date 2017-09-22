@@ -37,11 +37,12 @@ public class Main {
         //solaceHelper.init();
 
         PubsubHelper pubsubHelper = new PubsubHelper();
+        BigTableHelper bigTableHelper = new BigTableHelper();
 
-        BasketGeneratorHelper basketGeneratorHelper = new BasketGeneratorHelper(pubsubHelper);
+        BasketGeneratorHelper basketGeneratorHelper = new BasketGeneratorHelper(pubsubHelper, bigTableHelper);
         basketGeneratorHelper.generate(100);
 
-        SwapGeneratorHelper swapGeneratorHelper = new SwapGeneratorHelper(pubsubHelper);
+        SwapGeneratorHelper swapGeneratorHelper = new SwapGeneratorHelper(pubsubHelper, bigTableHelper);
         swapGeneratorHelper.generate(100);
     }
 

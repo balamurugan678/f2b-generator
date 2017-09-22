@@ -18,13 +18,15 @@ public class SwapGeneratorHelper {
 
     private SwapGenerator swapGenerator;
     private PubsubHelper pubsubHelper;
+    private BigTableHelper bigTableHelper;
     private ThreadLocalRandom random = ThreadLocalRandom.current();
     private RiskHelper riskHelper;
     private DateHelper dateHelper;
 
-    public SwapGeneratorHelper(PubsubHelper pubsubHelper) throws IOException {
+    public SwapGeneratorHelper(PubsubHelper pubsubHelper,BigTableHelper bigTableHelper) throws IOException {
         swapGenerator = new SwapGenerator();
         this.pubsubHelper = pubsubHelper;
+        this.bigTableHelper = bigTableHelper;
         riskHelper = new RiskHelper();
         dateHelper = new DateHelper();
     }
@@ -59,7 +61,8 @@ public class SwapGeneratorHelper {
                 //String riskEntry = riskHelper.getSwapEntry(data);
 
                 // Send swap trade
-                ApiFuture<String> messageIdFuture = pubsubHelper.send(xml, "swap", date);
+                String uuid = bigTableHelper.write(xml, "swap", "xml", date);
+                ApiFuture<String> messageIdFuture = pubsubHelper.send(uuid, "swap", "xml", date);
                 swapMessageIdFutures.add(messageIdFuture);
 
                 // Send risk entry
@@ -72,7 +75,8 @@ public class SwapGeneratorHelper {
                 boolean amendTrade = random.nextInt(0,1000) == 0;
                 if (amendTrade) {
                     String xml2 = xml.replace("<sequenceNumber>1</sequenceNumber>","<sequenceNumber>2</sequenceNumber>");
-                    ApiFuture<String> messageIdFuture2 = pubsubHelper.send(xml2,"basket", date);
+                    String uuid2 = bigTableHelper.write(xml2, "swap", "xml", date);
+                    ApiFuture<String> messageIdFuture2 = pubsubHelper.send(uuid2, "swap", "xml", date);
                     swapMessageIdFutures.add(messageIdFuture2);
                     messagesGenerated++;
                     totalAmendmentsSent++;
