@@ -4,6 +4,7 @@ import com.gcp.poc.f2b.generator.BasketGenerator;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
 import freemarker.template.TemplateException;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDate;
