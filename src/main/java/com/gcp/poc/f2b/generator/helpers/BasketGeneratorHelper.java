@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class BasketGeneratorHelper {
 
     private BasketGenerator basketGenerator;
@@ -110,6 +111,31 @@ public class BasketGeneratorHelper {
         }
 
         System.out.println("Generated 2 invalid baskets");
+    }
+
+    public String generate() throws IOException, TemplateException, ExecutionException, InterruptedException {
+        LocalDate date = LocalDate.now();
+
+        // Generate basket
+        Map<String, Object> data = basketGenerator.nextData(LocalDateTime.now());
+        String xml = basketGenerator.next(data);
+        List<String> riskEntries = riskHelper.getBasketEntries(data);
+
+        // Send basket
+        String uuid = bigTableHelper.write(xml, "basket", "xml", date);
+        ApiFuture<String> messageIdFuture = pubsubHelper.send(uuid, "basket", "xml", date);
+        messageIdFuture.get();
+
+        // Send risk entry
+        for (String riskEntry : riskEntries) {
+            uuid = bigTableHelper.write(riskEntry, "risk", "json", date);
+            messageIdFuture = pubsubHelper.send(uuid, "risk", "json", date);
+            messageIdFuture.get();
+        }
+
+        String escapedXML = xml.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n").replaceAll("\r", "");
+        String dateString = date.toString().replaceAll("-","");
+        return "{\"metadata\":{\"uuid\":\"" + uuid + "\", \"messageType\":\"basket\",\"messageFormat\":\"xml\",\"creationDate\":\"" + dateString + "\"}, \"message\":\"" + escapedXML + "\"}";
     }
 
     // Sends a number of messages over the last 5 days
