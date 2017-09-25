@@ -2,23 +2,19 @@ package com.gcp.poc.f2b.generator.helpers;
 
 import com.google.api.core.ApiFuture;
 import com.google.api.gax.batching.BatchingSettings;
-import com.google.cloud.ServiceOptions;
 import com.google.cloud.pubsub.v1.Publisher;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.Descriptors;
-import com.google.pubsub.v1.PublisherGrpc;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.TopicName;
+import org.springframework.stereotype.Component;
 import org.threeten.bp.Duration;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
+@Component
 public class PubsubHelper {
 
     private TopicName topicName = TopicName.create("gcp-f2brb", "f2b_demo_inlet_topic1");

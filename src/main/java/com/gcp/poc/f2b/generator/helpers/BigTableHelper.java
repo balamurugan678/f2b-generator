@@ -6,13 +6,13 @@ import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
+@Component
 public class BigTableHelper {
 
     Connection connection;
@@ -24,13 +24,14 @@ public class BigTableHelper {
     byte[] VALUE_QUALIFIER = Bytes.toBytes("value");
 
     public BigTableHelper() {
-        this("gcp-f2brb","dist-l1-ssd");
+        //this("gcp-f2brb","dist-l1-ssd");
+        connection = BigtableConfiguration.connect("gcp-f2brb", "dist-l1-ssd");
     }
-
+/*
     public BigTableHelper(String projectId, String instanceId) {
         connection = BigtableConfiguration.connect(projectId, instanceId);
     }
-
+*/
     // Note: This method must synchronously write data to big table before returning so uuid sent in pubsub can be used to retrieve data immediately
     public String write(String messageBody, String messageType, String messageFormat, LocalDate date) throws IOException {
         String uuid = UUID.randomUUID().toString();

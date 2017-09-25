@@ -4,9 +4,11 @@ import com.gcp.poc.f2b.generator.SwapGenerator;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
 import freemarker.template.TemplateException;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Component
 public class SwapGeneratorHelper {
 
     private SwapGenerator swapGenerator;
@@ -29,6 +32,24 @@ public class SwapGeneratorHelper {
         this.bigTableHelper = bigTableHelper;
         riskHelper = new RiskHelper();
         dateHelper = new DateHelper();
+    }
+
+    // Generates one
+    public String generate() throws IOException, TemplateException, ExecutionException, InterruptedException {
+        LocalDate date = LocalDate.now();
+
+        // Generate swap
+        Map<String, Object> data = swapGenerator.nextData(LocalDateTime.now());
+        String xml = swapGenerator.next(data);
+
+        // Send swap trade
+        String uuid = bigTableHelper.write(xml, "swap", "xml", date);
+        ApiFuture<String> messageIdFuture = pubsubHelper.send(uuid, "swap", "xml", date);
+        messageIdFuture.get();
+
+        String escapedXML = xml.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n").replaceAll("\r", "");
+        String dateString = date.toString().replaceAll("-","");
+        return "{\"metadata\":{\"uuid\":\"" + uuid + "\", \"messageType\":\"swap\",\"messageFormat\":\"xml\",\"creationDate\":\"" + dateString + "\"}, \"message\":\"" + escapedXML + "\"}";
     }
 
     // Sends a number of messages over the last 5 days
