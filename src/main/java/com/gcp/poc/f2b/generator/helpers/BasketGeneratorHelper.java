@@ -129,8 +129,8 @@ public class BasketGeneratorHelper {
 
         // Send risk entry
         for (String riskEntry : riskEntries) {
-            uuid = bigTableHelper.write(riskEntry, "risk", "json", date);
-            messageIdFuture = pubsubHelper.send(uuid, "risk", "json", date);
+            String uuid2 = bigTableHelper.write(riskEntry, "risk", "json", date);
+            messageIdFuture = pubsubHelper.send(uuid2, "risk", "json", date);
             messageIdFuture.get();
         }
 
